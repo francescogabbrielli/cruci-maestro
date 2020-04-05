@@ -1,0 +1,29 @@
+// Variables
+@cell-border: 1px solid black;
+@cell-size: 32px;
+
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  padding: 0px;
+  margin: 0px;
+}
+
+table td {
+  margin: 0px;
+  padding: 0px;
+}
+
+.schema {
+  border-right: @cell-border;
+  border-bottom: @cell-border;
+}
+
+.cell {
+  width: @cell-size;
+  height: @cell-size;
+  border-left: @cell-border;
+  border-top: @cell-border;
+  background-color: white;
+  z-index:10;
+}

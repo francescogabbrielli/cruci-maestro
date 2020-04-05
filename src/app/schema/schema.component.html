@@ -1,0 +1,10 @@
+<div class="container">
+  <table class="schema">
+    <tr *ngFor="let row of cells; index as i; last as lastRow">
+      <td *ngFor="let cell of row; index as j; last as lastColumn">
+        <div id="cell-{{i}}-{{j}}" class="cell" (mousedown)="prepareDrag(lastRow && lastColumn, $event)" >{{cell}}</div>
+      </td>
+    </tr>
+  </table>
+  <p><br/>
+</div>
