@@ -2,7 +2,20 @@
   <table class="schema">
     <tr *ngFor="let row of cells; index as i; last as lastRow">
       <td *ngFor="let cell of row; index as j; last as lastColumn">
-        <div id="cell-{{i}}-{{j}}" class="cell" (mousedown)="prepareDrag(lastRow && lastColumn, $event)" >{{cell}}</div>
+        <div *ngIf="j==state.x && i==state.y" class="cursor"></div>
+        <div id="cell-{{i}}-{{j}}" class="cell"
+          [ngClass]="{
+              'word-sh': state.horizontal && i==state.y && j==state.start,
+              'word-h': state.horizontal && i==state.y && j>=state.start && j<=state.end,
+              'word-eh': state.horizontal && i==state.y && j==state.end,
+              'word-sv': !state.horizontal && j==state.x && i==state.start,
+              'word-v': !state.horizontal && j==state.x && i>=state.start && i<=state.end,
+              'word-ev': !state.horizontal && j==state.x && i==state.end,
+              'block': cell==='.'
+              }"
+          (mousedown)="prepareDrag(lastRow && lastColumn, $event)">
+          {{cell}}
+        </div>
       </td>
     </tr>
   </table>

@@ -25,5 +25,63 @@ table td {
   border-left: @cell-border;
   border-top: @cell-border;
   background-color: white;
-  z-index:10;
+  z-index: 10;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  display: flex;
+  font-weight: bold;
+  font-size: @cell-size/2+2;
+}
+
+.block {
+  margin: 2px;
+  width: -2+@cell-size;
+  height: -2+@cell-size;
+  background-color: black;
+}
+
+.cursor {
+  opacity: 0.5;
+  z-index: 5;
+  border-left: @cell-border;
+  border-top: @cell-border;
+  width: @cell-size;
+  height: @cell-size;
+  background-color: yellow;
+  position: absolute;
+}
+
+.word-h {
+  width: @cell-size;
+  height: -2+@cell-size;
+  border-top: 2px solid purple;
+  border-bottom: 2px solid purple;
+}
+
+.word-sh {
+  width: -1+@cell-size;
+  border-left: 2px solid purple;
+}
+
+.word-eh {
+  width: -1+@cell-size;
+  border-right: 2px solid purple;
+}
+
+.word-v {
+  width: -2+@cell-size;
+  height: @cell-size;
+  border-left: 2px solid purple;
+  border-right: 2px solid purple;
+}
+
+.word-sv {
+  height: -1+@cell-size;
+  border-top: 2px solid purple;
+}
+
+.word-ev {
+  height: -1+@cell-size;
+  border-bottom: 2px solid purple;
 }
