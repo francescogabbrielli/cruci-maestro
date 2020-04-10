@@ -4,22 +4,25 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SchemaComponent } from './schema/schema.component';
+import { DefsComponent } from './defs/defs.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { LayoutModule } from '@angular/cdk/layout';
+import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card'
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-
+import { MatInputModule } from '@angular/material/input';
 
 @NgModule({
   declarations: [
     AppComponent,
-    SchemaComponent
+    SchemaComponent,
+    DefsComponent
   ],
   imports: [
     BrowserModule,
@@ -27,12 +30,14 @@ import { MatListModule } from '@angular/material/list';
     BrowserAnimationsModule,
     DragDropModule,
     LayoutModule,
+    FormsModule,
     MatCardModule,
     MatToolbarModule,
     MatButtonModule,
     MatSidenavModule,
     MatIconModule,
-    MatListModule
+    MatListModule,
+    MatInputModule
   ],
   providers: [],
   bootstrap: [AppComponent]

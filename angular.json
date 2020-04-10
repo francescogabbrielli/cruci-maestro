@@ -7,7 +7,7 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "less"
+          "style": "sass"
         }
       },
       "root": "",
@@ -28,8 +28,7 @@
               "src/assets"
             ],
             "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/styles.less"
+              "src/styles.sass"
             ],
             "scripts": []
           },
@@ -93,8 +92,7 @@
               "src/assets"
             ],
             "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/styles.less"
+              "src/styles.sass"
             ],
             "scripts": []
           }
@@ -130,5 +128,10 @@
   "defaultProject": "cruci-maestro",
   "cli": {
     "analytics": "69da8e1b-fa86-41c6-84dd-a4df2a7ed3aa"
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "styleext": "sass"
+    }
   }
 }

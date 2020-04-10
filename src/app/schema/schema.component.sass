@@ -1,0 +1,102 @@
+@import '~@angular/material/theming'
+@import '../theme.sass'
+
+// Variables
+$cell-border: 1px solid black
+$cell-size: 28px
+$cell-radius: 5px
+
+
+table
+  border-spacing: 0
+  border-collapse: collapse
+  padding: 0px
+  margin: 0px
+
+
+table td
+  margin: 0px
+  padding: 0px
+  border: $cell-border
+  width: $cell-size
+  height: $cell-size
+
+
+.noselect
+  -webkit-touch-callout: none /* iOS Safari */
+  -webkit-user-select: none /* Safari */
+  -khtml-user-select: none /* Konqueror HTML */
+  -moz-user-select: none /* Old versions of Firefox */
+  -ms-user-select: none /* Internet Explorer/Edge */
+  user-select: none /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
+
+
+.schema
+  border-right: $cell-border
+  border-bottom: $cell-border
+
+.cell
+  box-sizing: border-box
+  width: 100%
+  height: 100%
+  background-color: white
+  z-index: 10
+  justify-content: center
+  align-items: center
+  text-align: center
+  display: flex
+  font-weight: bold
+  font-size: $cell-size/2+2
+  border-color: gray
+  border-style: solid
+  border-width: 0px
+
+.cell.focused
+  border-color: map-get($primary, 400)
+
+.block
+  border: 2px solid white
+  background-color: black
+
+
+.cursor
+  opacity: 0.5
+  z-index: 5
+  width: $cell-size
+  height: $cell-size
+  background-color: map-get($primary, 100)
+  position: absolute
+
+
+.word-h
+  border-top-width: 2px
+  border-bottom-width: 2px
+
+
+.word-sh
+  border-top-left-radius: $cell-radius
+  border-bottom-left-radius: $cell-radius
+  border-left-width: 2px
+
+
+.word-eh
+  border-top-right-radius: $cell-radius
+  border-bottom-right-radius: $cell-radius
+  border-right-width: 2px
+
+
+.word-v
+  border-left-width: 2px
+  border-right-width: 2px
+
+
+.word-sv
+  border-top-left-radius: $cell-radius
+  border-top-right-radius: $cell-radius
+  border-top-width: 2px
+
+
+.word-ev
+  border-bottom-left-radius: $cell-radius
+  border-bottom-right-radius: $cell-radius
+  border-bottom-width: 2px

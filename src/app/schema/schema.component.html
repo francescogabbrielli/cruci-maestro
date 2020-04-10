@@ -1,23 +1,23 @@
-<div class="container">
-  <table class="schema">
-    <tr *ngFor="let row of cells; index as i; last as lastRow">
+  <table class="schema noselect" tabindex="1" (focus)="onFocus()" (blur)="onBlur()">
+    <tr *ngFor="let row of service.cells; index as i; last as lastRow">
       <td *ngFor="let cell of row; index as j; last as lastColumn">
         <div *ngIf="j==state.x && i==state.y" class="cursor"></div>
         <div id="cell-{{i}}-{{j}}" class="cell"
           [ngClass]="{
-              'word-sh': state.horizontal && i==state.y && j==state.start,
-              'word-h': state.horizontal && i==state.y && j>=state.start && j<=state.end,
-              'word-eh': state.horizontal && i==state.y && j==state.end,
-              'word-sv': !state.horizontal && j==state.x && i==state.start,
-              'word-v': !state.horizontal && j==state.x && i>=state.start && i<=state.end,
-              'word-ev': !state.horizontal && j==state.x && i==state.end,
-              'block': cell==='.'
+              'word-sh': state.horizontal && selection.startsWith(j,i),
+              'word-h': state.horizontal && selection.contains(j,i),
+              'word-eh': state.horizontal && selection.endsWith(j,i),
+              'word-sv': !state.horizontal && selection.startsWith(j,i),
+              'word-v': !state.horizontal && selection.contains(j,i),
+              'word-ev': !state.horizontal && selection.endsWith(j,i),
+              'block': cell==='.',
+              'focused': state.focused && cell!=='.'
               }"
-          (mousedown)="prepareDrag(lastRow && lastColumn, $event)">
+          (mousedown)="prepareDrag(i, j, lastRow && lastColumn, $event)">
           {{cell}}
         </div>
       </td>
     </tr>
   </table>
-  <p><br/>
-</div>
+  <defs [state]="state" [selection]="selection"></defs>
+  <span tabindex="3" onFocus="document.querySelector('.schema').focus()"></span>

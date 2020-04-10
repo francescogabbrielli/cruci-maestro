@@ -1,0 +1,16 @@
+<br/>
+<form class="def-form">
+  <mat-form-field class="def-input">
+    <mat-label>
+      <span *ngIf="selection.length()>1">
+        {{selection.length()}} letters - {{state.horizontal ? "Horizontal" : "Vertical"}}
+      </span>
+    </mat-label>
+    <input tabindex="2" name="def" matInput placeholder="...definition..."
+      [disabled]="selection.length()<=1"
+      [(ngModel)]="def.desc"
+      (keypress)="onChange()"
+      (paste)="onChange()"
+      (input)="onChange()">
+  </mat-form-field>
+</form>

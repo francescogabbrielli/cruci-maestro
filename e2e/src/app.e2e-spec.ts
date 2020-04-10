@@ -8,9 +8,9 @@ describe('workspace-project App', () => {
     page = new AppPage();
   });
 
-  it('should display welcome message', () => {
+  it('should display the schema table', () => {
     page.navigateTo();
-    expect(page.getSchemaClass()).toEqual('schema');
+    expect(page.getSchemaClass()).toContain('schema');
   });
 
   afterEach(async () => {
