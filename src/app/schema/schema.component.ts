@@ -1,4 +1,5 @@
 import { Component, HostListener } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { OnInit } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import $ from "jquery";
@@ -15,6 +16,7 @@ import { SchemaState } from './state';
 })
 export class SchemaComponent implements OnInit {
 
+  route:ActivatedRoute;
   config:ConfigService;
   service:SchemaService;
 
@@ -29,6 +31,8 @@ export class SchemaComponent implements OnInit {
   state: SchemaState = {x:0, y:0, horizontal: true, focused: false};
   selection: Highlight = new Highlight(0, 0, 0, 0);
 
+  sel:string
+
   onFocus() {
     this.state.focused = true;
   }
@@ -37,7 +41,8 @@ export class SchemaComponent implements OnInit {
     this.state.focused = false;
   }
 
-  constructor(config:ConfigService, service:SchemaService) {
+  constructor(route:ActivatedRoute, config:ConfigService, service:SchemaService) {
+    this.route = route;
     this.config = config;
     this.service = service;
     this.cells = this.service.create2DArray(999,999);
@@ -48,10 +53,18 @@ export class SchemaComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.service.populate(this.cells);
     this.reframe(this.size);
     $(document).mousemove(event=>this.resize(event));
     $(document).mouseup(event=>this.prepareDrag(undefined, undefined, false, event));
     this.highlightCurrentWord();
+    let sel = this.route.snapshot.paramMap.get('sel');
+    if (sel) {
+      const coords = sel.split('-').map(x=>parseInt(x));
+      this.moveCursor(coords[0], coords[1]);
+      this.selection = new Highlight(coords[0], coords[1], coords[2], coords[3]);
+      $('.schema').focus();
+    }
   }
 
   reframe(s) {
@@ -68,7 +81,7 @@ export class SchemaComponent implements OnInit {
           newCells[i][j] = " ";
         }
     }
-    this.service.cells = newCells;
+    this.service.set(newCells);
   }
 
   prepareDrag(i:number, j:number, activate:boolean, event) {
@@ -91,7 +104,7 @@ export class SchemaComponent implements OnInit {
     this.dragPosition = {x: event.clientX, y: event.clientY};
 
     if (activate)
-      this.selection = undefined;
+      this.selection = this.service.noSelection;
 
   }
 
@@ -114,9 +127,9 @@ export class SchemaComponent implements OnInit {
 
   getCurrentHighlight(start: number, end: number):Highlight {
     return this.state.horizontal
-      ? new Highlight(start, this.state.y, end, this.state.y)
-      : new Highlight(this.state.x, start, this.state.x, end);
-  }
+        ? new Highlight(start, this.state.y, end, this.state.y)
+        : new Highlight(this.state.x, start, this.state.x, end);
+    }
 
   highlightCurrentWord() {
     let start, end;
@@ -131,7 +144,7 @@ export class SchemaComponent implements OnInit {
         end = this.state.horizontal ? x : y;
       else break;
     let highlight = this.getCurrentHighlight(start, end);
-    if (!this.selection || !this.selection.equals(highlight))
+    if (!this.selection.equals(highlight))
       this.selection = highlight;
   }
 
@@ -161,7 +174,7 @@ export class SchemaComponent implements OnInit {
     this.service.setCell(this.state.y, this.state.x, value);
     if (old!==value && (old==="." || value===".")) {
       this.highlightCurrentWord();
-      this.service.reDef(this.state.x, this.state.y, old===".")
+      this.service.reDef(this.state.x, this.state.y, value===".")
     }
   }
 
@@ -214,8 +227,10 @@ export class SchemaComponent implements OnInit {
     if (event.key===".") {
       this.setCell(event.key);
     } else if (event.key.match(/^[a-z]$/)) {
-      this.setCell(event.key.toUpperCase());
-      this.moveCursor(1);
+      if (this.getCell()!=='.') {//do not overwrite a block just by typing lowercase
+        this.setCell(event.key.toUpperCase());
+        this.moveCursor(1);
+      }
     } else if (event.key.match(/^[A-Z]$/)) {
       this.setCell(event.key.toUpperCase());
     }

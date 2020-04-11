@@ -1,0 +1,11 @@
+<div class="definition-block" *ngFor="let d of defs">
+  <h3>{{d.title}}</h3>
+  <ol>
+    <li *ngFor="let line of d.lines">
+      <span *ngFor="let def of line; last as last">
+        <a routerLink="/schema/{{def.highlight}}" title="{{def.unused ? 'Definition not used' : ''}}" [ngClass]="{'definition': true, 'unused': def.unused}">{{def.desc}}</a>
+        <span *ngIf="!last"> - </span>
+      </span>
+    </li>
+  </ol>
+</div>

@@ -17,12 +17,16 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatInputModule } from '@angular/material/input';
+import { DefinitionListComponent } from './definition-list/definition-list.component';
+import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SchemaComponent,
-    DefsComponent
+    DefsComponent,
+    DefinitionListComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,

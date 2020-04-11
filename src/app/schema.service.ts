@@ -7,8 +7,11 @@ export class Highlight {
     this.start = [s0, s1];
     this.end = [e0, e1];
   }
+  isHorizontal():boolean {
+    return this.start[1] === this.end[1];
+  }
   equals(h:Highlight) {
-    return this.start[0] === h.start[0] && this.start[1] === h.start[1] && this.end[0] === h.end[0] && this.end[1] === h.end[1];
+    return h ? this.start[0] === h.start[0] && this.start[1] === h.start[1] && this.end[0] === h.end[0] && this.end[1] === h.end[1] : false;
   }
   startsWith(x:number, y:number) {
     return this.start[0] === x && this.start[1] === y;
@@ -53,6 +56,8 @@ export class SchemaService {
 
   defs:DefArray;
 
+  readonly noSelection:Highlight = new Highlight(-1,-1,-1,-1);
+
   constructor() {
     this.cells = this.create2DArray(10, 10);
     this.defs = {};
@@ -69,12 +74,26 @@ export class SchemaService {
     return ret;
   }
 
+  set(cells:string[][]):void {
+    this.cells = cells;
+  }
+
+  populate(cells:string[][]):void {
+    for (let i=0; i<this.cells.length; i++)
+      for (let j=0; j<this.cells[i].length; j++)
+        cells[i][j] = this.cells[i][j];
+  }
+
   getCell(i:number, j:number):string {
     return this.cells[i][j];
   }
 
   setCell(i:number, j:number, value:string):void {
     this.cells[i][j] = value;
+  }
+
+  getSize():[number,number] {
+    return [this.cells.length, this.cells[0].length];
   }
 
   setDef(def:Definition) {
@@ -91,7 +110,15 @@ export class SchemaService {
   }
 
   getDef(selection:Highlight):Definition {
+    selection = selection || this.noSelection;
     return this.defs[selection.toString()] || new Definition(selection);
+  }
+
+  *defsGenerator():IterableIterator<Definition> {
+    let keys:string[] = Object.keys(this.defs);
+    let step:number = 0;
+    while (step < keys.length)
+      yield this.defs[keys[step++]];
   }
 
   /********************************************************
@@ -100,8 +127,7 @@ export class SchemaService {
    *  => mark them as used or unused
    */
   reDef(x:number, y:number, blockAdded:boolean) {
-    for (let i of Object.keys(this.defs)) {
-      const def = this.defs[i];
+    for (let def of this.defsGenerator())
       if (def.highlight.contains(x, y)) {
         def.unused = blockAdded;
       } else if (def.highlight.start[1] === y && def.highlight.end[1] === y) {
@@ -111,7 +137,6 @@ export class SchemaService {
         if (def.highlight.start[1] === y+1 || def.highlight.end[1] === y-1)
           def.unused = !blockAdded;
       }
-    }
   }
 
 }
