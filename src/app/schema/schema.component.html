@@ -1,8 +1,16 @@
   <table class="schema noselect" tabindex="1" (focus)="onFocus()" (blur)="onBlur()">
     <tr *ngFor="let row of service.cells; index as i; last as lastRow">
-      <td *ngFor="let cell of row; index as j; last as lastColumn">
-        <div *ngIf="j==state.x && i==state.y" class="cursor"></div>
+      <td *ngFor="let cell of row; index as j; last as lastColumn" (mousedown)="prepareDrag(i, j, lastRow && lastColumn, $event)">
+        <div *ngIf="cell==='.'" class="block"
+          [style.width]="config.cellSize+'px'" [style.height]="config.cellSize+'px'">
+        </div>
+        <div *ngIf="j==state.x && i==state.y" class="cursor"
+          [style.width]="config.cellSize+'px'" [style.height]="config.cellSize+'px'">
+        </div>
         <div id="cell-{{i}}-{{j}}" class="cell"
+          [style.width]="config.cellSize+'px'" [style.height]="config.cellSize+'px'"
+          [style.font-size]="(3+config.cellSize/2)+'px'"
+          [style.border-color]="selection.unused ? 'red' : ''"
           [ngClass]="{
               'word-sh': state.horizontal && selection.startsWith(j,i),
               'word-h': state.horizontal && selection.contains(j,i),
@@ -10,10 +18,8 @@
               'word-sv': !state.horizontal && selection.startsWith(j,i),
               'word-v': !state.horizontal && selection.contains(j,i),
               'word-ev': !state.horizontal && selection.endsWith(j,i),
-              'block': cell==='.',
               'focused': state.focused && cell!=='.'
-              }"
-          (mousedown)="prepareDrag(i, j, lastRow && lastColumn, $event)">
+              }">
           {{cell}}
         </div>
       </td>

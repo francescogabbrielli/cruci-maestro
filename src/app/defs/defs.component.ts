@@ -1,4 +1,5 @@
 import { Component, OnInit, OnChanges, Input } from '@angular/core';
+import {Subscription} from 'rxjs/Subscription';
 
 import { SchemaService, Definition, Highlight } from '../schema.service';
 
@@ -14,6 +15,8 @@ export class DefsComponent implements OnInit, OnChanges {
 
   service: SchemaService;
 
+  subscription: Subscription;
+
   @Input()
   state: SchemaState;
 
@@ -27,6 +30,10 @@ export class DefsComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    this.subscription = this.service.updated
+       .subscribe(item => {
+         if (item) this.ngOnChanges();
+       });
   }
 
   ngOnChanges(): void {

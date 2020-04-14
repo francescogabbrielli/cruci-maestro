@@ -9,4 +9,6 @@ export class ConfigService {
 
   cellSize:number = 28;
 
+  solutionType:string = "fixed";
+
 }

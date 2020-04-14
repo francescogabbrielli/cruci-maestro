@@ -3,13 +3,15 @@ import { Routes, RouterModule } from '@angular/router';
 import { SchemaComponent } from './schema/schema.component';
 import { DefinitionListComponent } from './definition-list/definition-list.component';
 import { SettingsComponent } from './settings/settings.component';
+import { LoginComponent } from './login/login.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/schema', pathMatch: 'full' },
   {path: 'schema', component: SchemaComponent},
   {path: 'schema/:sel', component: SchemaComponent},
   {path: 'definitions', component: DefinitionListComponent},
-  {path: 'settings', component: SettingsComponent}
+  {path: 'settings', component: SettingsComponent},
+  {path: 'login', component: LoginComponent}
 ];
 
 @NgModule({

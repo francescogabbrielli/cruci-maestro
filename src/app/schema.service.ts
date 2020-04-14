@@ -1,8 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+
+import { BackendService } from './backend.service'
 
 export class Highlight {
-  start: [number, number]
-  end: [number, number]
+  start: [number, number];
+  end: [number, number];
+  unused?:boolean;
+
   constructor(s0:number, s1:number, e0:number, e1:number) {
     this.start = [s0, s1];
     this.end = [e0, e1];
@@ -35,6 +40,7 @@ export class Definition {
   unused:boolean;
   isnew:boolean;
   highlight?:Highlight;
+
   constructor(highlight:Highlight) {
     this.desc = "";
     this.unused = false;
@@ -52,9 +58,13 @@ interface DefArray {
 })
 export class SchemaService {
 
+  title:string;
+
   cells:string[][];
 
   defs:DefArray;
+
+  updated:BehaviorSubject<boolean>;
 
   readonly noSelection:Highlight = new Highlight(-1,-1,-1,-1);
 
@@ -65,6 +75,7 @@ export class SchemaService {
     prova.desc = "Prova di definizione";
     prova.isnew = true;
     this.setDef(prova);
+    this.updated = new BehaviorSubject<boolean>(true);
   }
 
   create2DArray(rows:number, cols:number):string[][] {
@@ -139,4 +150,36 @@ export class SchemaService {
       }
   }
 
+  load() {
+    // client.auth.loginWithCredential(new AnonymousCredential()).then(() =>
+    //   db.collection('schemas').findOne()
+    // ).then((doc) => {
+    //   this.cells = JSON.parse(atob(doc["cells"]));
+    //   this.defs = {};
+    //   for (let d of doc["definitions"]) {
+    //     let h = new Highlight(d.highlight.start[0], d.highlight.start[1], d.highlight.end[0], d.highlight.end[1]);
+    //     let def = new Definition(h);
+    //     def.desc = d.desc;
+    //     def.unused = d.unused;
+    //     def.isnew = false;
+    //     this.defs[h.toString()] = def;
+    //   }
+    //   this.title = doc["title"];
+    //   this.updated.next(true);
+    // }).catch(err => {
+    //   console.error(err)
+    // });
+  }
+
+  save() {
+    //client.auth.loginWithRedirect(new GoogleRedirectCredential());
+    // client.auth.loginWithCredential(new UserPasswordCredential("demo@francescogabbrielli.it", "demo20"))
+    // .then((login) => {
+    //   return db.collection('tests').updateOne({title: "test4"}, {$set: {owner_id: 'd', test: true}}, {upsert: true})
+    // }).then(res => {
+    //   console.log(res, btoa(JSON.stringify(this.cells)));
+    // }).catch(err => {
+    //   console.error(err);
+    // });
+  }
 }

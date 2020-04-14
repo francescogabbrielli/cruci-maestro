@@ -1,8 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { OnInit } from '@angular/core';
+import { OnInit, OnChanges } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import $ from "jquery";
+import {Subscription} from 'rxjs/Subscription';
 
 import { ConfigService } from '../config.service';
 import { SchemaService, Highlight } from '../schema.service';
@@ -14,11 +15,13 @@ import { SchemaState } from './state';
   templateUrl: './schema.component.html',
   styleUrls: ['./schema.component.sass']
 })
-export class SchemaComponent implements OnInit {
+export class SchemaComponent implements OnInit, OnChanges {
 
   route:ActivatedRoute;
   config:ConfigService;
   service:SchemaService;
+
+  subscription:Subscription;
 
   cells:string[][];
   size:{rows:number, cols:number};
@@ -46,25 +49,35 @@ export class SchemaComponent implements OnInit {
     this.config = config;
     this.service = service;
     this.cells = this.service.create2DArray(999,999);
-    this.size = {
-      rows: this.service.cells.length,
-      cols: this.service.cells[0].length
-    };
   }
 
   ngOnInit() {
-    this.service.populate(this.cells);
-    this.reframe(this.size);
     $(document).mousemove(event=>this.resize(event));
     $(document).mouseup(event=>this.prepareDrag(undefined, undefined, false, event));
-    this.highlightCurrentWord();
-    let sel = this.route.snapshot.paramMap.get('sel');
-    if (sel) {
-      const coords = sel.split('-').map(x=>parseInt(x));
-      this.moveCursor(coords[0], coords[1]);
-      this.selection = new Highlight(coords[0], coords[1], coords[2], coords[3]);
-      $('.schema').focus();
-    }
+    this.subscription = this.service.updated
+       .subscribe(item => {
+         this.service.populate(this.cells);
+         this.size = {
+           rows: this.service.cells.length,
+           cols: this.service.cells[0].length
+         };
+         this.reframe(this.size);
+         //this.selection = new Highlight(0, 0, 0, 0);
+         let sel = this.route.snapshot.paramMap.get('sel');
+         if (sel)
+           this.setCurrentHighlight(...sel.split('-').map(x=>parseInt(x)));
+         else
+           this.highlightCurrentWord();
+         $('.schema').focus();
+       });
+  }
+
+  ngOnChanges() {
+    console.log("SCHEMA CHANGE");
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   reframe(s) {
@@ -92,11 +105,11 @@ export class SchemaComponent implements OnInit {
     //stop dragging
     if(this.dragging && !activate) {
       this.size = this.resizing;
-      //console.log("RESIZE", this.size);
       if (this.state.x >= this.size.cols)
         this.state.x = this.size.cols-1;
       if (this.state.y >= this.size.rows)
         this.state.y = this.size.rows-1;
+      //TODO: resize all definitions ending at a border!
       this.highlightCurrentWord();
     }
 
@@ -122,6 +135,17 @@ export class SchemaComponent implements OnInit {
     if (newSize!==this.resizing && t > this.lastReframe+50) {
       this.lastReframe = t;
       this.reframe(newSize);
+    }
+  }
+
+  setCurrentHighlight(x0:number, y0:number, x1:number, y1:number) {
+    this.state.horizontal = y0===y1;
+    console.log(x0, y0);
+    this.moveCursor(x0, y0);
+    if (this.selection.start[0]!==x0 || this.selection.start[1]!==y0
+      || this.selection.end[0]!==x1 || this.selection.end[1]!==y1) {
+      this.selection = new Highlight(x0, y0, x1, y1);
+      this.selection.unused = true;
     }
   }
 

@@ -5,6 +5,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SchemaComponent } from './schema/schema.component';
 import { DefsComponent } from './defs/defs.component';
+import { DefinitionListComponent } from './definition-list/definition-list.component';
+import { SettingsComponent } from './settings/settings.component';
+import { LoginComponent } from './login/login.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -17,8 +20,18 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatInputModule } from '@angular/material/input';
-import { DefinitionListComponent } from './definition-list/definition-list.component';
-import { SettingsComponent } from './settings/settings.component';
+import { MatSelectModule } from '@angular/material/select';
+
+import {
+    Stitch,
+    RemoteMongoClient,
+    AnonymousCredential,
+    UserPasswordCredential,
+    GoogleRedirectCredential
+} from 'mongodb-stitch-browser-sdk';
+
+const client = Stitch.initializeDefaultAppClient('crucimaestro-vbgbj');
+const db = client.getServiceClient(RemoteMongoClient.factory, 'CruciMaestro-Service').db('cruci-maestro');
 
 @NgModule({
   declarations: [
@@ -26,7 +39,8 @@ import { SettingsComponent } from './settings/settings.component';
     SchemaComponent,
     DefsComponent,
     DefinitionListComponent,
-    SettingsComponent
+    SettingsComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -41,7 +55,8 @@ import { SettingsComponent } from './settings/settings.component';
     MatSidenavModule,
     MatIconModule,
     MatListModule,
-    MatInputModule
+    MatInputModule,
+    MatSelectModule
   ],
   providers: [],
   bootstrap: [AppComponent]

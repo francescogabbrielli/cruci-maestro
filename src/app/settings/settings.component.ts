@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { ConfigService } from '../config.service';
+
 @Component({
   selector: 'settings',
   templateUrl: './settings.component.html',
@@ -7,7 +9,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SettingsComponent implements OnInit {
 
-  constructor() { }
+  config:ConfigService;
+
+  cellSize:number = 28;
+
+  solutionType:string = "fixed";
+
+  constructor(config:ConfigService) {
+    this.config = config;
+  }
 
   ngOnInit(): void {
   }
