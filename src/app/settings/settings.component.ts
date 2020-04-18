@@ -1,25 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 
-import { ConfigService } from '../config.service';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.sass']
 })
-export class SettingsComponent implements OnInit {
 
-  config:ConfigService;
+export class SettingsComponent implements OnInit, OnDestroy {
 
-  cellSize:number = 28;
+  auth:AuthService;
 
-  solutionType:string = "fixed";
+  @ViewChild('userForm')
+  userForm:NgForm;
 
-  constructor(config:ConfigService) {
-    this.config = config;
+
+  constructor(auth:AuthService) {
+    this.auth = auth;
   }
 
-  ngOnInit(): void {
+  ngOnInit(){
+
+  }
+
+  ngOnDestroy() {
+    if (this.userForm.dirty)
+      this.auth.updateUserConfig();
   }
 
 }

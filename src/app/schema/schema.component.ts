@@ -5,7 +5,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import $ from "jquery";
 import {Subscription} from 'rxjs/Subscription';
 
-import { ConfigService } from '../config.service';
+import { AuthService } from '../auth.service';
 import { SchemaService, Highlight } from '../schema.service';
 
 import { SchemaState } from './state';
@@ -18,18 +18,19 @@ import { SchemaState } from './state';
 export class SchemaComponent implements OnInit, OnChanges {
 
   route:ActivatedRoute;
-  config:ConfigService;
+  auth:AuthService;
   service:SchemaService;
 
-  subscription:Subscription;
+  private subscription:Subscription;
 
   cells:string[][];
   size:{rows:number, cols:number};
+  cellSize:number;
 
-  resizing:{rows:number, cols:number};
-  lastReframe:number                    = 0;
-  dragPosition:{x:number, y:number};
-  dragging:boolean                      = false;
+  private resizing:{rows:number, cols:number};
+  private lastReframe:number                    = 0;
+  private dragPosition:{x:number, y:number};
+  private dragging:boolean                      = false;
 
   state: SchemaState = {x:0, y:0, horizontal: true, focused: false};
   selection: Highlight = new Highlight(0, 0, 0, 0);
@@ -44,11 +45,12 @@ export class SchemaComponent implements OnInit, OnChanges {
     this.state.focused = false;
   }
 
-  constructor(route:ActivatedRoute, config:ConfigService, service:SchemaService) {
+  constructor(route:ActivatedRoute, auth:AuthService, service:SchemaService) {
     this.route = route;
-    this.config = config;
+    this.auth = auth;
     this.service = service;
     this.cells = this.service.create2DArray(999,999);
+    this.cellSize = this.auth.getUserConfig().cellSize;
   }
 
   ngOnInit() {
@@ -128,8 +130,8 @@ export class SchemaComponent implements OnInit, OnChanges {
     let diffX = event.clientX-this.dragPosition.x;
     let diffY = event.clientY-this.dragPosition.y;
     let newSize = {
-      rows: this.size.rows + Math.trunc(diffY/this.config.cellSize),
-      cols: this.size.cols + Math.trunc(diffX/this.config.cellSize)
+      rows: this.size.rows + Math.trunc(diffY/this.cellSize),
+      cols: this.size.cols + Math.trunc(diffX/this.cellSize)
     };
     let t = new Date().getTime();
     if (newSize!==this.resizing && t > this.lastReframe+50) {
@@ -138,9 +140,10 @@ export class SchemaComponent implements OnInit, OnChanges {
     }
   }
 
+  setCurrentHighlight(...coords:number[]);
   setCurrentHighlight(x0:number, y0:number, x1:number, y1:number) {
     this.state.horizontal = y0===y1;
-    console.log(x0, y0);
+    // console.log(x0, y0);
     this.moveCursor(x0, y0);
     if (this.selection.start[0]!==x0 || this.selection.start[1]!==y0
       || this.selection.end[0]!==x1 || this.selection.end[1]!==y1) {

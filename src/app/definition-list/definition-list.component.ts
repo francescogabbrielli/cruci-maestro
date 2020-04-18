@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
 
 import { SchemaService, Definition } from '../schema.service';
 
@@ -41,23 +42,30 @@ export class DefinitionListComponent implements OnInit {
 
   service:SchemaService;
 
+  private subscription:Subscription;
+
   defs:Array<DefinitionBlock>;
 
   constructor(service:SchemaService) {
     this.service = service;
-    let size = this.service.getSize();
-    this.defs = [
-      new DefinitionBlock(true, size[0]),
-      new DefinitionBlock(false, size[1])
-    ];
-    for (let def of service.defsGenerator()) {
-      let block = this.defs[def.highlight.isHorizontal() ? 0 : 1];
-      block.add(def);
-    }
   }
 
   ngOnInit(): void {
-
+    this.subscription = this.service.updated
+       .subscribe(item => {
+         let size = this.service.getSize();
+         this.defs = [
+           new DefinitionBlock(true, size[0]),
+           new DefinitionBlock(false, size[1])
+         ];
+         for (let def of this.service.defsGenerator()) {
+           let block = this.defs[def.highlight.isHorizontal() ? 0 : 1];
+           block.add(def);
+         }
+       });
   }
 
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
 }

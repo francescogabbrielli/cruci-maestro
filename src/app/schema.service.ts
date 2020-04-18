@@ -1,7 +1,9 @@
-import { Injectable, EventEmitter } from '@angular/core';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
 
-import { BackendService } from './backend.service'
+import { AuthService } from './auth.service';
+import { BackendService } from './backend.service';
 
 export class Highlight {
   start: [number, number];
@@ -58,6 +60,11 @@ interface DefArray {
 })
 export class SchemaService {
 
+  private auth:AuthService;
+  private be:BackendService;
+
+  private id:string;
+
   title:string;
 
   cells:string[][];
@@ -66,16 +73,24 @@ export class SchemaService {
 
   updated:BehaviorSubject<boolean>;
 
+  private userSubscription:Subscription;
+
   readonly noSelection:Highlight = new Highlight(-1,-1,-1,-1);
 
-  constructor() {
+  constructor(auth:AuthService, be:BackendService) {
+    this.auth = auth;
+    this.be = be;
     this.cells = this.create2DArray(10, 10);
     this.defs = {};
-    let prova = new Definition(new Highlight(0,1,9,1));
-    prova.desc = "Prova di definizione";
-    prova.isnew = true;
-    this.setDef(prova);
-    this.updated = new BehaviorSubject<boolean>(true);
+    //this.userSubscription = this.auth.subscribe(item => {
+      this.load();
+    ///});
+    this.updated = new BehaviorSubject<boolean>(false);
+    // let prova = new Definition(new Highlight(0,1,9,1));
+    // prova.desc = "Prova di definizione";
+    // prova.isnew = true;
+    // this.setDef(prova);
+    //this.updated = new BehaviorSubject<boolean>(true);
   }
 
   create2DArray(rows:number, cols:number):string[][] {
@@ -151,28 +166,51 @@ export class SchemaService {
   }
 
   load() {
-    // client.auth.loginWithCredential(new AnonymousCredential()).then(() =>
-    //   db.collection('schemas').findOne()
-    // ).then((doc) => {
-    //   this.cells = JSON.parse(atob(doc["cells"]));
-    //   this.defs = {};
-    //   for (let d of doc["definitions"]) {
-    //     let h = new Highlight(d.highlight.start[0], d.highlight.start[1], d.highlight.end[0], d.highlight.end[1]);
-    //     let def = new Definition(h);
-    //     def.desc = d.desc;
-    //     def.unused = d.unused;
-    //     def.isnew = false;
-    //     this.defs[h.toString()] = def;
-    //   }
-    //   this.title = doc["title"];
-    //   this.updated.next(true);
-    // }).catch(err => {
-    //   console.error(err)
-    // });
+
+    let load;
+    //if (this.auth.getUserConfig().authorMode)
+      load = this.be.loadSchema();
+    //else
+      //return;
+
+    load.then(doc => {
+      this.id = doc._id.toString();
+      this.cells = JSON.parse(atob(doc["cells"]));
+      this.defs = {};
+      for (let d of doc["definitions"]) {
+        let h = new Highlight(d.highlight.start[0], d.highlight.start[1], d.highlight.end[0], d.highlight.end[1]);
+        let def = new Definition(h);
+        def.desc = d.desc;
+        def.unused = d.unused;
+        def.isnew = false;
+        this.defs[h.toString()] = def;
+      }
+      this.title = doc["title"];
+      this.updated.next(true);
+    }).catch(err => {
+      console.error(err)
+    });
+
   }
 
   save() {
-    //client.auth.loginWithRedirect(new GoogleRedirectCredential());
+    if (this.auth.isLogged()) {
+      let cells = btoa(JSON.stringify(this.cells));
+      let user = this.auth.getUser();
+      let defs = [];
+      let unused = false;
+      for (let def of this.defsGenerator())
+        if (!def.unused)
+          defs.push(def);
+        else
+          unused = true;
+      this.be.saveSchema(this.id, cells, defs).then(
+          res => console.log(res),
+          err => console.log(err)
+        );
+      if (unused)
+        alert("Attenzione! ci sono definizione non utilizzate. Non verrano salvate");
+    }
     // client.auth.loginWithCredential(new UserPasswordCredential("demo@francescogabbrielli.it", "demo20"))
     // .then((login) => {
     //   return db.collection('tests').updateOne({title: "test4"}, {$set: {owner_id: 'd', test: true}}, {upsert: true})

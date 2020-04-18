@@ -26,10 +26,13 @@
         *ngIf="isHandset$ | async">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
-      <span>{{config.title}}</span>
+      <span>{{title}}</span>
       <span class="toolbar-spacer"></span>
-      <a class="button fancy-button button-enabled" (click)="save()"><mat-icon aria-hidden="false" aria-label="home icon">save</mat-icon></a>
-      <a class="button fancy-button button-enabled" routerLink="/login" ><mat-icon aria-hidden="false" aria-label="home icon">person</mat-icon></a>
+      <a class="button button-enabled" (click)="save()"><mat-icon aria-hidden="false" aria-label="home icon">save</mat-icon></a>
+      <a class="button button-enabled" routerLink="/login" >
+        <span class="user" *ngIf="auth.isLogged()">{{auth.getUser().username}}</span>
+        <mat-icon aria-hidden="false" aria-label="home icon">person</mat-icon>
+      </a>
     </mat-toolbar>
     <mat-card>
       <mat-card-title>{{schema.title}}</mat-card-title>

@@ -10,46 +10,46 @@ import { AuthService } from '../auth.service';
 })
 export class LoginComponent implements OnInit {
 
+  auth:AuthService;
+  router:Router;
+  route:ActivatedRoute;
+
   loading = false;
   submitted = false;
 
-  user:{username:string, password:string};
+  model:{username:string, password:string};
+  error:string;
   returnUrl: string;
 
+  hidden:boolean=true;
+
   constructor(
-      private route: ActivatedRoute,
-      private router: Router,
-      private auth: AuthService,
-  ) {
-      // redirect to home if already logged in
-      if (this.auth.isLogged()) {
-          this.router.navigate(['/']);
-      }
+      route: ActivatedRoute,
+      router: Router,
+      auth: AuthService) {
+    this.auth = auth;
+    this.route = route;
+    this.router = router;
+    // redirect to home if already logged in
+    if (this.auth.isLogged()) {
+      this.router.navigate(['/']);
+    }
   }
 
-
   ngOnInit() {
-    this.user = {username:'', password:''};
+    this.model = {username:'', password:''};
     // get return url from route parameters or default to '/'
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
-  // convenience getter for easy access to form fields
-  get f() { return this.loginForm.controls; }
-
   onSubmit() {
       this.submitted = true;
-
+      this.error = '';
       this.loading = true;
-      this.auth.login(this.user.username, this.user.password);
-          // .pipe(first())
-          // .subscribe(
-          //     data => {
-          //         this.router.navigate([this.returnUrl]);
-          //     },
-          //     error => {
-          //         this.loading = false;
-          //     });
+      this.auth.login(this.model.username, this.model.password).then(
+        data => this.router.navigate(["/"]),
+        err => this.error = err
+      ).finally(() => this.loading = false);
   }
 
 }

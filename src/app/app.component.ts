@@ -3,7 +3,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
-import { ConfigService } from './config.service';
+import { AuthService } from './auth.service';
 import { SchemaService } from './schema.service';
 
 @Component({
@@ -13,7 +13,9 @@ import { SchemaService } from './schema.service';
 })
 export class AppComponent {
 
-  config:ConfigService;
+  readonly title:string = "CruciMaestro";
+
+  auth:AuthService;
   schema:SchemaService;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
@@ -22,8 +24,9 @@ export class AppComponent {
       shareReplay()
     );
 
-  constructor(private breakpointObserver: BreakpointObserver, config:ConfigService, schema:SchemaService) {
-    this.config = config;
+  constructor(private breakpointObserver: BreakpointObserver,
+    auth:AuthService, schema:SchemaService) {
+    this.auth = auth;
     this.schema = schema;
   }
 

@@ -2,14 +2,14 @@
     <tr *ngFor="let row of service.cells; index as i; last as lastRow">
       <td *ngFor="let cell of row; index as j; last as lastColumn" (mousedown)="prepareDrag(i, j, lastRow && lastColumn, $event)">
         <div *ngIf="cell==='.'" class="block"
-          [style.width]="config.cellSize+'px'" [style.height]="config.cellSize+'px'">
+          [style.width]="cellSize+'px'" [style.height]="cellSize+'px'">
         </div>
         <div *ngIf="j==state.x && i==state.y" class="cursor"
-          [style.width]="config.cellSize+'px'" [style.height]="config.cellSize+'px'">
+          [style.width]="cellSize+'px'" [style.height]="cellSize+'px'">
         </div>
         <div id="cell-{{i}}-{{j}}" class="cell"
-          [style.width]="config.cellSize+'px'" [style.height]="config.cellSize+'px'"
-          [style.font-size]="(3+config.cellSize/2)+'px'"
+          [style.width]="cellSize+'px'" [style.height]="cellSize+'px'"
+          [style.font-size]="(3+cellSize/2)+'px'"
           [style.border-color]="selection.unused ? 'red' : ''"
           [ngClass]="{
               'word-sh': state.horizontal && selection.startsWith(j,i),

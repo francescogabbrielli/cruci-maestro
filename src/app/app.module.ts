@@ -21,17 +21,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-
-import {
-    Stitch,
-    RemoteMongoClient,
-    AnonymousCredential,
-    UserPasswordCredential,
-    GoogleRedirectCredential
-} from 'mongodb-stitch-browser-sdk';
-
-const client = Stitch.initializeDefaultAppClient('crucimaestro-vbgbj');
-const db = client.getServiceClient(RemoteMongoClient.factory, 'CruciMaestro-Service').db('cruci-maestro');
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
   declarations: [
@@ -56,7 +46,8 @@ const db = client.getServiceClient(RemoteMongoClient.factory, 'CruciMaestro-Serv
     MatIconModule,
     MatListModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    MatRadioModule
   ],
   providers: [],
   bootstrap: [AppComponent]

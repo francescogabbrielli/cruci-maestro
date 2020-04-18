@@ -1,14 +1,19 @@
-<form (ngSubmit)="onSubmit()">
+<form #theForm="ngForm" (ngSubmit)="onSubmit()">
   <div>
     <h2>Login</h2>
     <mat-form-field class="form-group">
       <mat-label>Username</mat-label>
-      <input name="def" matInput [(ngModel)]="user.username">
+      <input name="username"
+        required matInput [(ngModel)]="model.username" #username="ngModel"/>
     </mat-form-field>
     <mat-form-field class="form-group">
       <mat-label>Password</mat-label>
-      <input name="def" matInput [(ngModel)]="user.password">
+      <input name="password" type="password"
+        required matInput [(ngModel)]="model.password" #password="ngModel"/>
     </mat-form-field>
-    <button mat-flat-button color="primary">Login</button>
+    <button type="submit" mat-flat-button color="primary"
+      [disabled]="!theForm.form.valid || loading">Login</button>
+    <p><br/></p>
+    <p class="error" [hidden]="!error">Login error: {{error}}</p>
   </div>
 </form>

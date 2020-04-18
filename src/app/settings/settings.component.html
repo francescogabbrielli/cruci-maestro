@@ -1,31 +1,52 @@
-<form class="settings-form">
+<mat-card>
+  <mat-card-title>Schema</mat-card-title>
+  <mat-card-content>
+    <form name="schemaForm" class="settings-form" #schemaForm="ngForm">
+      <mat-form-field>
+        <mat-label>
+          <span>
+            Solution Type
+          </span>
+        </mat-label>
+        <mat-select name="solution-type" [(ngModel)]="auth.getUserConfig().solutionType" aria-label="Select an option">
+          <mat-option value="fixed">Schema Fisso</mat-option>
+          <mat-option value="free">Schema Libero</mat-option>
+          <mat-option value="obliged">Incroci Obbligati</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+  </mat-card-content>
+</mat-card>
 
-  <mat-form-field>
-    <mat-label>
-      <span>
-        Solution Type
-      </span>
-    </mat-label>
-    <mat-select name="solution-type" [(ngModel)]="config.solutionType" aria-label="Select an option">
-      <mat-option value="fixed">Schema Fisso</mat-option>
-      <mat-option value="free">Schema Libero</mat-option>
-      <mat-option value="obliged">Incroci Obbligati</mat-option>
-    </mat-select>
-  </mat-form-field>
+<mat-card>
+  <mat-card-title>User</mat-card-title>
+  <mat-card-content>
+    <form name="userForm" class="settings-form" #userForm="ngForm">
 
-  <mat-form-field>
-    <mat-label>
-      <span>
-        Cell size
-      </span>
-    </mat-label>
-    <input id="cellsize" name="cellsize" matInput type="number" min="20" max="50"
-      [(ngModel)]="config.cellSize" #cellsize="ngModel">
-    <div *ngIf="cellsize.errors && (cellsize.dirty || cellsize.touched)">
-      <div [hidden]="!cellsize.errors">
-          Number should be between 0 and 100
-      </div>
-    </div>
-  </mat-form-field>
+      <mat-form-field>
+        <mat-label>
+          <span>
+            Cell size
+          </span>
+        </mat-label>
+        <input id="cellsize" name="cellsize" matInput type="number" min="20" max="50"
+          [(ngModel)]="auth.getUserConfig().cellSize" #cellsize="ngModel">
+        <div *ngIf="cellsize.errors && (cellsize.dirty || cellsize.touched)">
+          <div [hidden]="!cellsize.errors">
+              Number should be between 20 and 50
+          </div>
+        </div>
+      </mat-form-field>
 
-</form>
+      <p><label id="author-radio-label">Editing mode:</label></p>
+      <mat-radio-group
+        name="author"
+        aria-labelledby="author-radio-label"
+        [(ngModel)]="auth.getUserConfig().authorMode"
+        [disabled]="!auth.isLogged()">
+        <mat-radio-button *ngFor="let label of ['Solver', 'Author']; last as last" [value]="last">{{label}}</mat-radio-button>
+      </mat-radio-group>
+
+    </form>
+  </mat-card-content>
+</mat-card>
