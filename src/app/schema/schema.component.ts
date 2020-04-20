@@ -23,6 +23,7 @@ export class SchemaComponent implements OnInit, OnChanges {
 
   private subscription:Subscription;
 
+  input:string;
   cells:string[][];
   size:{rows:number, cols:number};
   cellSize:number;
@@ -37,12 +38,41 @@ export class SchemaComponent implements OnInit, OnChanges {
 
   sel:string
 
-  onFocus() {
+  onFocus($event) {
     this.state.focused = true;
+    $event.target.value = this.getCell();
+    $event.target.select();
   }
 
   onBlur() {
     this.state.focused = false;
+  }
+
+  onSelect($event) {
+    console.log($event);
+    $event.target.select();
+  }
+
+  onInput($event) {
+    $event.target.select();
+    if (this.input===".") {
+      this.setCell(".");
+    } else if (this.input===" ") {
+      this.setCell(" ");
+      this.moveCursor(1);
+    } else if (this.input==="") {
+      this.setCell(" ");
+      $event.target.value = this.getCell();
+      $event.target.select();
+    } else if (this.input.match(/^[a-z]$/)) {
+      if (this.getCell()!=='.') {//do not overwrite a block just by typing lowercase
+        this.setCell(this.input.toUpperCase());
+        this.moveCursor(1);
+      }
+    } else if (this.input.match(/^[A-Z]$/)) {
+      this.setCell(this.input.toUpperCase());
+    }
+    //console.log("INPUT: ", $event);
   }
 
   constructor(route:ActivatedRoute, auth:AuthService, service:SchemaService) {
@@ -180,15 +210,15 @@ export class SchemaComponent implements OnInit, OnChanges {
       y = this.state.horizontal ? this.state.y : this.state.y+x;
       x = this.state.horizontal ? this.state.x+x : this.state.x;
     }
-    // let highlight = x!==this.state.x && y!==this.state.y;
-    // if (!highlight && this.getCell() === ".")
-    //   highlight = true;
     if (x<0 || x>=this.size.cols || y<0 || y>=this.size.rows)
       return;
+
     this.state.x = x;
     this.state.y = y;
-    //if (highlight || this.getCell() === ".")
-      this.highlightCurrentWord();
+
+    this.highlightCurrentWord();
+    $('.input').val(this.getCell()).select();
+    setTimeout(() => $('.input').focus(), 100);
   }
 
   getCell() {
@@ -212,7 +242,7 @@ export class SchemaComponent implements OnInit, OnChanges {
     }
   }
 
-  //repeatable keys
+  //repeatable keys (PC only?)
   @HostListener('window:keydown', ['$event'])
   keyDown(event: KeyboardEvent) {
     if (!this.state.focused)
@@ -232,34 +262,14 @@ export class SchemaComponent implements OnInit, OnChanges {
       //this.toggleOrientation(false);
     } else if (event.key === "Enter") {
       this.toggleOrientation();
-    } else if (event.key === " ") {
-      this.setCell(" ");
-      this.moveCursor(1);
+    } else if (event.key === "Home") {
+      this.moveCursor(0, 0);
+    } else if (event.key === "End") {
+      this.moveCursor(this.size.cols-1, this.size.rows-1);
     } else if (event.keyCode==8 || event.key === "Backspace") {
+      this.setCell(" ");
       this.moveCursor(-1);
-      this.setCell(" ");
       return false;
-    } else if (event.key === "Delete") {
-      this.setCell(" ");
-    }
-  }
-
-  //non-repeatable keys
-  @HostListener('window:keyup', ['$event'])
-  keyUp(event: KeyboardEvent) {
-
-    if (!this.state.focused)
-      return true;
-
-    if (event.key===".") {
-      this.setCell(event.key);
-    } else if (event.key.match(/^[a-z]$/)) {
-      if (this.getCell()!=='.') {//do not overwrite a block just by typing lowercase
-        this.setCell(event.key.toUpperCase());
-        this.moveCursor(1);
-      }
-    } else if (event.key.match(/^[A-Z]$/)) {
-      this.setCell(event.key.toUpperCase());
     }
   }
 

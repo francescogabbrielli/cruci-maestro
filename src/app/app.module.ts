@@ -49,7 +49,6 @@ import { MatRadioModule } from '@angular/material/radio';
     MatSelectModule,
     MatRadioModule
   ],
-  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
