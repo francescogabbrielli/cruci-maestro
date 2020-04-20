@@ -48,11 +48,6 @@ export class SchemaComponent implements OnInit, OnChanges {
     this.state.focused = false;
   }
 
-  onSelect($event) {
-    console.log($event);
-    $event.target.select();
-  }
-
   onInput($event) {
     $event.target.select();
     if (this.input===".") {
@@ -80,7 +75,6 @@ export class SchemaComponent implements OnInit, OnChanges {
     this.auth = auth;
     this.service = service;
     this.cells = this.service.create2DArray(999,999);
-    this.cellSize = this.auth.getUserConfig().cellSize;
   }
 
   ngOnInit() {
@@ -89,6 +83,7 @@ export class SchemaComponent implements OnInit, OnChanges {
     this.subscription = this.service.updated
        .subscribe(item => {
          this.service.populate(this.cells);
+         this.cellSize = this.auth.getUserConfig().cellSize;
          this.size = {
            rows: this.service.cells.length,
            cols: this.service.cells[0].length

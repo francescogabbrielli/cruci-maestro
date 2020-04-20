@@ -83,14 +83,9 @@ export class SchemaService {
     this.cells = this.create2DArray(10, 10);
     this.defs = {};
     //this.userSubscription = this.auth.subscribe(item => {
-      this.load();
+    this.load();
     ///});
     this.updated = new BehaviorSubject<boolean>(false);
-    // let prova = new Definition(new Highlight(0,1,9,1));
-    // prova.desc = "Prova di definizione";
-    // prova.isnew = true;
-    // this.setDef(prova);
-    //this.updated = new BehaviorSubject<boolean>(true);
   }
 
   create2DArray(rows:number, cols:number):string[][] {

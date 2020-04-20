@@ -16,7 +16,7 @@ describe('AuthService', () => {
   });
 
   it(`should have as default config solution type 'fixed'`, () => {
-    expect(service.defaultConfig.solutionType).toEqual('fixed');
+    expect(service.getUserConfig().solutionType).toEqual('fixed');
   });
 
 });

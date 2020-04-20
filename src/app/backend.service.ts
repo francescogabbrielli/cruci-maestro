@@ -1,3 +1,7 @@
+/**
+ * Stitch Backend Client
+ */
+
 import { Injectable } from '@angular/core';
 import { EJSON, ObjectId } from 'bson';
 
@@ -17,14 +21,22 @@ export class BackendService {
   private client:StitchAppClient;
   private db;
 
+  private initPromise:boolean;
+
   constructor() {
     this.client = Stitch.initializeDefaultAppClient('crucimaestro-vbgbj');
     this.db = this.client.getServiceClient(RemoteMongoClient.factory, 'CruciMaestro-Service').db('cruci-maestro');
   }
 
-  login(user:string, password:string):Promise<any> {
-    let loginUser = this.client.auth.loginWithCredential(new UserPasswordCredential(user, password));
-    return loginUser.then(
+  async logout():Promise<any> {
+     this.client.logout();
+     this.initPromise = this.client.auth.loginWithCredential(new AnonymousCredential());
+     return this.initPromise;
+  }
+
+  async login(user:string, password:string):Promise<any> {
+    this.initPromise = this.client.auth.loginWithCredential(new UserPasswordCredential(user, password));
+    return this.initPromise.then(
         data => {
           return {
             id: data.id,
@@ -43,7 +55,8 @@ export class BackendService {
       );
   }
 
-  updateUserConfig(user) {
+  async updateUserConfig(user) {
+    await this.initPromise;
     this.db.collection('configs').updateOne({user_id: user.id}, {$set: {config: user.config}}, {upsert:true})
     .then(
       res => console.log(res),
@@ -51,11 +64,13 @@ export class BackendService {
     );
   }
 
-  loadSchema() {
+  async loadSchema() {
+    await this.initPromise;
     return this.db.collection('schemas').findOne();
   }
 
-  saveSchema(id: string, cells:string, defs:string[]) {
+  async saveSchema(id: string, cells:string, defs:string[]) {
+    await this.initPromise;
     return this.db.collection('schemas').updateOne(
       {_id: new ObjectId(id)}, {$set: {cells: cells, definitions: defs}}
     );

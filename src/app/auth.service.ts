@@ -39,8 +39,13 @@ export class AuthService {
       solutionType: "fixed",
       authorMode: false
     };
-    //this.currentUser = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('currentUser')));
-  }
+
+    let user = JSON.parse(localStorage.getItem('currentUser'));
+    if (user!==null)
+      this.login(user.username, user.password);
+    else
+      this.logout();
+    }
 
   subscribe(fn) {
     return this.user.subscribe(fn);
@@ -61,6 +66,8 @@ export class AuthService {
   login(username, password):Promise<boolean> {
     return this.be.login(username, password).then(
       (user:User) => {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        console.log("LOGIN", user);
         this.user.next(user);
         return true;
       }
@@ -69,7 +76,11 @@ export class AuthService {
 
   logout() {
       // remove user from local storage and set current user to null
-      // localStorage.removeItem('currentUser');
+      this.be.logout().then(
+        data => console.log(data),
+        err  => console.log(err),
+      );
+      localStorage.removeItem('currentUser');
       this.user.next(null);
   }
 
