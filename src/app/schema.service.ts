@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { AuthService } from './auth.service';
 import { BackendService } from './backend.service';
 
+
 export class Highlight {
   start: [number, number];
   end: [number, number];
@@ -82,10 +83,12 @@ export class SchemaService {
     this.be = be;
     this.cells = this.create2DArray(10, 10);
     this.defs = {};
-    //this.userSubscription = this.auth.subscribe(item => {
-    this.load();
-    ///});
     this.updated = new BehaviorSubject<boolean>(false);
+    this.userSubscription = this.auth.subscribe(item => {
+      console.log("USER CHANGED", item );
+      this.load();
+    });
+    //this.updated.subscribe((v) => console.log("UPDATED", v));
   }
 
   create2DArray(rows:number, cols:number):string[][] {
@@ -164,13 +167,18 @@ export class SchemaService {
 
     let load;
     //if (this.auth.getUserConfig().authorMode)
-      load = this.be.loadSchema();
+      load = this.be.loadSchema(this.auth.getUserConfig().authorMode);
     //else
       //return;
 
-    load.then(doc => {
+    load.then((doc) => {
+      
       this.id = doc._id.toString();
-      this.cells = JSON.parse(atob(doc["cells"]));
+
+      this.set(this.create2DArray(doc.rows, doc.cols));
+      if (this.auth.getUserConfig().authorMode)
+        this.cells = JSON.parse(atob(doc["cells"]));
+
       this.defs = {};
       for (let d of doc["definitions"]) {
         let h = new Highlight(d.highlight.start[0], d.highlight.start[1], d.highlight.end[0], d.highlight.end[1]);
@@ -180,10 +188,13 @@ export class SchemaService {
         def.isnew = false;
         this.defs[h.toString()] = def;
       }
+
       this.title = doc["title"];
+
       this.updated.next(true);
+
     }).catch(err => {
-      console.error(err)
+      console.error(err);
     });
 
   }

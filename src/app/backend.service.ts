@@ -21,7 +21,7 @@ export class BackendService {
   private client:StitchAppClient;
   private db;
 
-  private initPromise:boolean;
+  private initPromise:Promise<any>;
 
   constructor() {
     this.client = Stitch.initializeDefaultAppClient('crucimaestro-vbgbj');
@@ -29,7 +29,7 @@ export class BackendService {
   }
 
   async logout():Promise<any> {
-     this.client.logout();
+     this.client.auth.logout();
      this.initPromise = this.client.auth.loginWithCredential(new AnonymousCredential());
      return this.initPromise;
   }
@@ -57,6 +57,7 @@ export class BackendService {
 
   async updateUserConfig(user) {
     await this.initPromise;
+    //TODO: ottimizzare restituendo se i campi cambiati comportano un reload
     this.db.collection('configs').updateOne({user_id: user.id}, {$set: {config: user.config}}, {upsert:true})
     .then(
       res => console.log(res),
@@ -64,9 +65,13 @@ export class BackendService {
     );
   }
 
-  async loadSchema() {
+  async loadSchema(isAuthor:boolean) {
     await this.initPromise;
-    return this.db.collection('schemas').findOne();
+    const options = {
+      limit: 1,
+      projection: isAuthor ? {} : {cells: 0}
+    };
+    return this.db.collection('schemas').find({}, options).first();
   }
 
   async saveSchema(id: string, cells:string, defs:string[]) {

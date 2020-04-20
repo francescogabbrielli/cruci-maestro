@@ -2,8 +2,9 @@ import { Component, HostListener } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OnInit, OnChanges } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import $ from "jquery";
+
 import {Subscription} from 'rxjs/Subscription';
+import $ from "jquery";
 
 import { AuthService } from '../auth.service';
 import { SchemaService, Highlight } from '../schema.service';
@@ -29,9 +30,9 @@ export class SchemaComponent implements OnInit, OnChanges {
   cellSize:number;
 
   private resizing:{rows:number, cols:number};
-  private lastReframe:number                    = 0;
+  private lastReframe:number = 0;
   private dragPosition:{x:number, y:number};
-  private dragging:boolean                      = false;
+  private dragging:boolean = false;
 
   state: SchemaState = {x:0, y:0, horizontal: true, focused: false};
   selection: Highlight = new Highlight(0, 0, 0, 0);
@@ -246,15 +247,19 @@ export class SchemaComponent implements OnInit, OnChanges {
     if (event.key === "ArrowRight") {
       this.moveCursor(this.state.x+1, this.state.y);
       //this.toggleOrientation(true);
+      return false;
     } else if (event.key === "ArrowLeft") {
       this.moveCursor(this.state.x-1, this.state.y);
       //this.toggleOrientation(true);
+      return false;
     } else if (event.key === "ArrowDown") {
       this.moveCursor(this.state.x, this.state.y+1);
       //this.toggleOrientation(false);
+      return false;
     } else if (event.key === "ArrowUp") {
       this.moveCursor(this.state.x, this.state.y-1);
       //this.toggleOrientation(false);
+      return false;
     } else if (event.key === "Enter") {
       this.toggleOrientation();
     } else if (event.key === "Home") {

@@ -30,10 +30,6 @@ export class AppComponent {
     this.schema = schema;
   }
 
-  load() {
-    this.schema.load();
-  }
-
   save() {
     this.schema.save();
   }

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { skip } from 'rxjs/operators';
 
 import { BackendService } from './backend.service'
 
@@ -39,16 +40,16 @@ export class AuthService {
       solutionType: "fixed",
       authorMode: false
     };
-
+    //this.user.subscribe((v) => console.log("USER", v));
     let user = JSON.parse(localStorage.getItem('currentUser'));
     if (user!==null)
       this.login(user.username, user.password);
     else
       this.logout();
-    }
+  }
 
   subscribe(fn) {
-    return this.user.subscribe(fn);
+    return this.user.pipe(skip(1)).subscribe(fn);
   }
 
   getUser():User {
@@ -77,16 +78,17 @@ export class AuthService {
   logout() {
       // remove user from local storage and set current user to null
       this.be.logout().then(
-        data => console.log(data),
+        data => this.user.next(null),
         err  => console.log(err),
       );
       localStorage.removeItem('currentUser');
-      this.user.next(null);
+      console.log("LOGOUT");
   }
 
   updateUserConfig() {
     if (this.user.value != null) {
-      this.be.updateUserConfig(this.user.value);
+      this.be.updateUserConfig(this.user.value).then(() =>
+        this.user.next(this.user.value));
     }
   }
 
