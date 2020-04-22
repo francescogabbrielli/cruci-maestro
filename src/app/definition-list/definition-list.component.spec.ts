@@ -1,25 +1,25 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { DefinitionListComponent } from './definition-list.component';
+import { DefinitionListComponent } from './definition-list.component'
 
 describe('DefinitionListComponent', () => {
-  let component: DefinitionListComponent;
-  let fixture: ComponentFixture<DefinitionListComponent>;
+  let component: DefinitionListComponent
+  let fixture: ComponentFixture<DefinitionListComponent>
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ DefinitionListComponent ]
     })
-    .compileComponents();
-  }));
+    .compileComponents()
+  }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DefinitionListComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(DefinitionListComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})

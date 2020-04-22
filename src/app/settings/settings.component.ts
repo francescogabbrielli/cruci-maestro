@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
+import { NgForm } from '@angular/forms'
 
-import { AuthService } from '../auth.service';
+import { AuthService } from '../auth.service'
 
 @Component({
   selector: 'settings',
@@ -11,14 +11,14 @@ import { AuthService } from '../auth.service';
 
 export class SettingsComponent implements OnInit, OnDestroy {
 
-  auth:AuthService;
+  auth:AuthService
 
   @ViewChild('userForm')
-  userForm:NgForm;
+  userForm:NgForm
 
 
   constructor(auth:AuthService) {
-    this.auth = auth;
+    this.auth = auth
   }
 
   ngOnInit(){
@@ -27,7 +27,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.userForm.dirty)
-      this.auth.updateUserConfig();
+      this.auth.updateUserConfig()
   }
 
 }

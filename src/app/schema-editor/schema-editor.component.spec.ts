@@ -1,25 +1,25 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { SchemaEditorComponent } from './schema-editor.component';
+import { SchemaEditorComponent } from './schema-editor.component'
 
 describe('SchemaEditorComponent', () => {
-  let component: SchemaEditorComponent;
-  let fixture: ComponentFixture<SchemaEditorComponent>;
+  let component: SchemaEditorComponent
+  let fixture: ComponentFixture<SchemaEditorComponent>
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ SchemaEditorComponent ]
     })
-    .compileComponents();
-  }));
+    .compileComponents()
+  }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SchemaEditorComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(SchemaEditorComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})

@@ -1,36 +1,36 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import { Component, OnInit, OnDestroy } from '@angular/core'
+import { Subscription } from 'rxjs/Subscription'
 
-import { SchemaService } from '../schema.service';
-import { Definition } from '../schema.model';
+import { SchemaService } from '../schema.service'
+import { Definition } from '../schema.model'
 
 class DefinitionBlock {
-  title: string;
-  lines: Definition[][];
-  horizontal:boolean;
+  title: string
+  lines: Definition[][]
+  horizontal:boolean
   constructor(horizontal:boolean, size:number) {
-    this.title = horizontal ? "Horizontals" : "Verticals";
-    this.lines = Array(size);
-    this.horizontal = horizontal;
+    this.title = horizontal ? "Horizontals" : "Verticals"
+    this.lines = Array(size)
+    this.horizontal = horizontal
   }
   add(def:Definition):void {
-    let dim = this.horizontal ? 0 : 1;
-    let high = def.highlight;
-    let line = this.lines[high.start[1-dim]];
+    let dim = this.horizontal ? 0 : 1
+    let high = def.highlight
+    let line = this.lines[high.start[1-dim]]
     if (!line) {
-      line = [def];
+      line = [def]
     } else {
       for (var i=0; i<line.length; i++) {
-        let h = line[i].highlight;
+        let h = line[i].highlight
         if ((high.start[dim] < h.start[dim]) || (high.start[dim]===h.start[dim] && high.end[dim]<h.end[dim])) {
-          line.splice(i, 0, def);
-          break;
+          line.splice(i, 0, def)
+          break
         }
       }
       if (i===line.length)
-        line.push(def);
+        line.push(def)
     }
-    this.lines[high.start[1-dim]] = line;
+    this.lines[high.start[1-dim]] = line
   }
 }
 
@@ -41,32 +41,32 @@ class DefinitionBlock {
 })
 export class DefinitionListComponent implements OnInit {
 
-  service:SchemaService;
+  service:SchemaService
 
-  private subscription:Subscription;
+  private subscription:Subscription
 
-  defs:Array<DefinitionBlock>;
+  defs:Array<DefinitionBlock>
 
   constructor(service:SchemaService) {
-    this.service = service;
+    this.service = service
   }
 
   ngOnInit(): void {
     this.subscription = this.service
        .subscribe(item => {
-         let size = this.service.getSize();
+         let size = this.service.getSize()
          this.defs = [
            new DefinitionBlock(true, size.rows),
            new DefinitionBlock(false, size.cols)
-         ];
+         ]
          for (let def of this.service.defsGenerator()) {
-           let block = this.defs[def.highlight.isHorizontal() ? 0 : 1];
-           block.add(def);
+           let block = this.defs[def.highlight.isHorizontal() ? 0 : 1]
+           block.add(def)
          }
-       });
+       })
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.subscription.unsubscribe()
   }
 }

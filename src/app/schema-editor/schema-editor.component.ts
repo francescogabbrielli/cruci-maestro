@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core'
 
-import { AuthService } from '../auth.service';
-import { SchemaService } from '../schema.service';
-import { Definition, Highlight, SchemaType } from '../schema.model';
-import { SchemaState } from '../schema/state';
+import { AuthService } from '../auth.service'
+import { SchemaService } from '../schema.service'
+import { Definition, Highlight, SchemaType } from '../schema.model'
+import { SchemaState } from '../schema/state'
 
 
 @Component({
@@ -13,39 +13,39 @@ import { SchemaState } from '../schema/state';
 })
 export class SchemaEditorComponent implements OnInit {
 
-  auth:AuthService;
-  schema:SchemaService;
+  auth:AuthService
+  schema:SchemaService
 
-  state:SchemaState;
+  state:SchemaState
 
-  selection:Highlight;
+  selection:Highlight
 
-  tabindex = { defs: 2 };
+  tabindex = { defs: 2 }
 
-  authorMode:boolean;
+  authorMode:boolean
 
-  type:SchemaType;
+  type:SchemaType
 
   onStateChanged(s:SchemaState) {
-    this.state = s;
+    this.state = s
   }
 
   onSelected(h:Highlight) {
-    this.selection = h;
+    this.selection = h
   }
 
   constructor(auth:AuthService, schema: SchemaService) {
-    this.auth = auth;
-    this.schema = schema;
+    this.auth = auth
+    this.schema = schema
   }
 
   ngOnInit(): void {
     this.schema.subscribe(() => {
-      let config = this.auth.getUserConfig();
-      this.authorMode = config.authorMode;
-      this.type = this.schema.model.type;
-      console.log("INIT EDITOR:", this.authorMode);
-    });
+      let config = this.auth.getUserConfig()
+      this.authorMode = config.authorMode
+      this.type = this.schema.model.type
+      console.log("INIT EDITOR:", this.authorMode)
+    })
   }
 
 }

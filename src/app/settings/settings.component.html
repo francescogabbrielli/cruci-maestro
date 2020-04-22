@@ -44,7 +44,7 @@
         aria-labelledby="author-radio-label"
         [(ngModel)]="auth.getUserConfig().authorMode"
         [disabled]="!auth.isLogged()">
-        <mat-radio-button *ngFor="let label of ['Solver', 'Author']; last as last" [value]="last">{{label}}</mat-radio-button>
+        <mat-radio-button *ngFor="let label of ['Solver', 'Author'] last as last" [value]="last">{{label}}</mat-radio-button>
       </mat-radio-group>
 
     </form>

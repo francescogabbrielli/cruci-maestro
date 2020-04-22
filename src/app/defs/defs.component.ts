@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy, OnChanges, Input } from '@angular/core';
-import {Subscription} from 'rxjs/Subscription';
+import { Component, OnInit, OnDestroy, OnChanges, Input } from '@angular/core'
+import {Subscription} from 'rxjs/Subscription'
 
-import { SchemaService } from '../schema.service';
-import { Definition, Highlight } from '../schema.model';
-import { SchemaState } from '../schema/state';
+import { SchemaService } from '../schema.service'
+import { Definition, Highlight } from '../schema.model'
+import { SchemaState } from '../schema/state'
 
 
 @Component({
@@ -13,40 +13,40 @@ import { SchemaState } from '../schema/state';
 })
 export class DefsComponent implements OnInit, OnDestroy, OnChanges {
 
-  service: SchemaService;
+  service: SchemaService
 
-  subscription: Subscription;
-
-  @Input()
-  state: SchemaState;
+  subscription: Subscription
 
   @Input()
-  selection: Highlight;
+  state: SchemaState
 
   @Input()
-  tabindex: number;
+  selection: Highlight
 
-  def: Definition;
+  @Input()
+  tabindex: number
+
+  def: Definition
 
   constructor(service: SchemaService) {
-    this.service = service;
+    this.service = service
   }
 
   ngOnInit(): void {
     this.subscription = this.service.subscribe(item => {
-       if (item) this.ngOnChanges();
-     });
+       if (item) this.ngOnChanges()
+     })
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.subscription.unsubscribe()
   }
 
   ngOnChanges(): void {
-    this.def = this.service.getDef(this.selection);
+    this.def = this.service.getDef(this.selection)
   }
 
   onChange():void {
-    this.service.setDef(this.def);
+    this.service.setDef(this.def)
   }
 }
