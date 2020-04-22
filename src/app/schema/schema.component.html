@@ -1,7 +1,7 @@
   <input class="input" size="1" maxlength="1" type="text" maxlength="1" tabindex="1" [(ngModel)]="input"
     (focus)="onFocus($event)" (blur)="onBlur()" (input)="onInput($event)">
   <table class="schema noselect">
-    <tr *ngFor="let row of service.cells; index as i; last as lastRow">
+    <tr *ngFor="let row of service.model.cells; index as i; last as lastRow">
       <td *ngFor="let cell of row; index as j; last as lastColumn"
         (mousedown)="prepareDrag(i, j, lastRow && lastColumn, $event)"
         (dblclick)="toggleOrientation()">
@@ -29,5 +29,5 @@
       </td>
     </tr>
   </table>
-  <defs [state]="state" [selection]="selection"></defs>
-  <span tabindex="3" onFocus="document.querySelector('.input').focus()"></span>
+  <!--defs [state]="state" [selection]="selection"></defs>
+  <span tabindex="3" onFocus="document.querySelector('.input').focus()"></span-->

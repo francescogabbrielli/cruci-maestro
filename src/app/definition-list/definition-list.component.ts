@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
-import { SchemaService, Definition } from '../schema.service';
+import { SchemaService } from '../schema.service';
+import { Definition } from '../schema.model';
 
 class DefinitionBlock {
   title: string;
@@ -51,12 +52,12 @@ export class DefinitionListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.subscription = this.service.updated
+    this.subscription = this.service
        .subscribe(item => {
          let size = this.service.getSize();
          this.defs = [
-           new DefinitionBlock(true, size[0]),
-           new DefinitionBlock(false, size[1])
+           new DefinitionBlock(true, size.rows),
+           new DefinitionBlock(false, size.cols)
          ];
          for (let def of this.service.defsGenerator()) {
            let block = this.defs[def.highlight.isHorizontal() ? 0 : 1];

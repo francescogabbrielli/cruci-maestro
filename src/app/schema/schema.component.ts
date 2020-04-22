@@ -1,14 +1,14 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, EventEmitter, Output } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { OnInit, OnChanges } from '@angular/core';
+import { OnInit, OnDestroy, OnChanges } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import {Subscription} from 'rxjs/Subscription';
 import $ from "jquery";
 
 import { AuthService } from '../auth.service';
-import { SchemaService, Highlight } from '../schema.service';
-
+import { SchemaService } from '../schema.service';
+import { SchemaModel, Highlight } from '../schema.model';
 import { SchemaState } from './state';
 
 @Component({
@@ -16,7 +16,7 @@ import { SchemaState } from './state';
   templateUrl: './schema.component.html',
   styleUrls: ['./schema.component.sass']
 })
-export class SchemaComponent implements OnInit, OnChanges {
+export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
 
   route:ActivatedRoute;
   auth:AuthService;
@@ -37,7 +37,14 @@ export class SchemaComponent implements OnInit, OnChanges {
   state: SchemaState = {x:0, y:0, horizontal: true, focused: false};
   selection: Highlight = new Highlight(0, 0, 0, 0);
 
-  sel:string
+  sel:string;
+
+  @Output()
+  selected = new EventEmitter<Highlight>();
+
+  @Output()
+  stateChanged = new EventEmitter<SchemaState>();
+
 
   onFocus($event) {
     this.state.focused = true;
@@ -81,14 +88,11 @@ export class SchemaComponent implements OnInit, OnChanges {
   ngOnInit() {
     $(document).mousemove(event=>this.resize(event));
     $(document).mouseup(event=>this.prepareDrag(undefined, undefined, false, event));
-    this.subscription = this.service.updated
+    this.subscription = this.service
        .subscribe(item => {
          this.service.populate(this.cells);
          this.cellSize = this.auth.getUserConfig().cellSize;
-         this.size = {
-           rows: this.service.cells.length,
-           cols: this.service.cells[0].length
-         };
+         this.size = this.service.getSize();
          this.reframe(this.size);
          //this.selection = new Highlight(0, 0, 0, 0);
          let sel = this.route.snapshot.paramMap.get('sel');
@@ -96,16 +100,17 @@ export class SchemaComponent implements OnInit, OnChanges {
            this.setCurrentHighlight(...sel.split('-').map(x=>parseInt(x)));
          else
            this.highlightCurrentWord();
-         $('.schema').focus();
+         $('.input').focus();
+         this.stateChanged.emit(this.state);
        });
-  }
-
-  ngOnChanges() {
-    console.log("SCHEMA CHANGE");
   }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
+  }
+
+  ngOnChanges() {
+    console.log("SCHEMA CHANGE");
   }
 
   reframe(s) {
@@ -122,7 +127,7 @@ export class SchemaComponent implements OnInit, OnChanges {
           newCells[i][j] = " ";
         }
     }
-    this.service.set(newCells);
+    this.service.setCells(newCells);
   }
 
   prepareDrag(i:number, j:number, activate:boolean, event) {
@@ -175,6 +180,7 @@ export class SchemaComponent implements OnInit, OnChanges {
       || this.selection.end[0]!==x1 || this.selection.end[1]!==y1) {
       this.selection = new Highlight(x0, y0, x1, y1);
       this.selection.unused = true;
+      this.selected.emit(this.selection);
     }
   }
 
@@ -197,8 +203,10 @@ export class SchemaComponent implements OnInit, OnChanges {
         end = this.state.horizontal ? x : y;
       else break;
     let highlight = this.getCurrentHighlight(start, end);
-    if (!this.selection.equals(highlight))
+    if (!this.selection.equals(highlight)) {
       this.selection = highlight;
+      this.selected.emit(this.selection);
+    }
   }
 
   moveCursor(x:number, y?:number) {
@@ -211,6 +219,7 @@ export class SchemaComponent implements OnInit, OnChanges {
 
     this.state.x = x;
     this.state.y = y;
+    this.stateChanged.emit(this.state);
 
     this.highlightCurrentWord();
     $('.input').val(this.getCell()).select();
@@ -234,6 +243,7 @@ export class SchemaComponent implements OnInit, OnChanges {
   toggleOrientation(horizontal?:boolean) {
     if (horizontal == undefined || horizontal!==this.state.horizontal) {
       this.state.horizontal = !this.state.horizontal;
+      this.stateChanged.emit(this.state);
       this.highlightCurrentWord();
     }
   }

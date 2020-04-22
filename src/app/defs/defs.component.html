@@ -6,7 +6,7 @@
         {{selection.length()}} letters - {{state.horizontal ? "Horizontal" : "Vertical"}}
       </span>
     </mat-label>
-    <input tabindex="2" name="def" matInput placeholder="...definition..."
+    <input [tabindex]="tabindex" name="def" matInput placeholder="...definition..."
       [disabled]="selection.length()<=1"
       [(ngModel)]="def.desc"
       (keypress)="onChange()"
@@ -14,3 +14,4 @@
       (input)="onChange()">
   </mat-form-field>
 </form>
+<span [tabindex]="tabindex+1" onFocus="document.querySelector('.input').focus()"></span>

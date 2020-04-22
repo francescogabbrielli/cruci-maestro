@@ -1,8 +1,8 @@
-import { Component, OnInit, OnChanges, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, Input } from '@angular/core';
 import {Subscription} from 'rxjs/Subscription';
 
-import { SchemaService, Definition, Highlight } from '../schema.service';
-
+import { SchemaService } from '../schema.service';
+import { Definition, Highlight } from '../schema.model';
 import { SchemaState } from '../schema/state';
 
 
@@ -11,7 +11,7 @@ import { SchemaState } from '../schema/state';
   templateUrl: './defs.component.html',
   styleUrls: ['./defs.component.sass']
 })
-export class DefsComponent implements OnInit, OnChanges {
+export class DefsComponent implements OnInit, OnDestroy, OnChanges {
 
   service: SchemaService;
 
@@ -23,6 +23,9 @@ export class DefsComponent implements OnInit, OnChanges {
   @Input()
   selection: Highlight;
 
+  @Input()
+  tabindex: number;
+
   def: Definition;
 
   constructor(service: SchemaService) {
@@ -30,10 +33,13 @@ export class DefsComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.subscription = this.service.updated
-       .subscribe(item => {
-         if (item) this.ngOnChanges();
-       });
+    this.subscription = this.service.subscribe(item => {
+       if (item) this.ngOnChanges();
+     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   ngOnChanges(): void {

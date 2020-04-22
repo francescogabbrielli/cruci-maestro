@@ -22,6 +22,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
+import { SchemaEditorComponent } from './schema-editor/schema-editor.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { MatRadioModule } from '@angular/material/radio';
     DefsComponent,
     DefinitionListComponent,
     SettingsComponent,
-    LoginComponent
+    LoginComponent,
+    SchemaEditorComponent,
   ],
   imports: [
     BrowserModule,

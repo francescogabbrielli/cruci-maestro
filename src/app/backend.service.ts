@@ -5,6 +5,8 @@
 import { Injectable } from '@angular/core';
 import { EJSON, ObjectId } from 'bson';
 
+import { SchemaModel } from './schema.model';
+
 import {
     Stitch, StitchAppClient,
     RemoteMongoClient,
@@ -65,19 +67,38 @@ export class BackendService {
     );
   }
 
-  async loadSchema(isAuthor:boolean) {
+  async loadSchema(isAuthor:boolean):Promise<SchemaModel> {
     await this.initPromise;
     const options = {
       limit: 1,
       projection: isAuthor ? {} : {cells: 0}
     };
-    return this.db.collection('schemas').find({}, options).first();
+    return this.db.collection('schemas').find({}, options).first().then(doc => {
+      let model:SchemaModel = {
+        id: doc._id.toString(),
+        title: doc.title,
+        type: doc.type,
+        size: [doc.rows, doc.cols],
+        definitions: doc["definitions"]
+      };
+      if (doc.cells !== undefined)
+        model.cells = JSON.parse(atob(doc.cells));
+      return model;
+    });
   }
 
-  async saveSchema(id: string, cells:string, defs:string[]) {
+  async saveSchema(model:SchemaModel) {
     await this.initPromise;
+    let id = model.id;
+    let m = {...model, ...{
+      cells: btoa(JSON.stringify(model.cells)),
+      rows: model.size[0],
+      cols: model.size[1]
+    }};
+    delete m['size'];
+    delete m['id'];
     return this.db.collection('schemas').updateOne(
-      {_id: new ObjectId(id)}, {$set: {cells: cells, definitions: defs}}
+      {_id: new ObjectId(id)}, {$set: m}
     );
   }
 
