@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, OnDestroy } from '@angular/core'
+import { Subscription } from 'rxjs/Subscription'
 
-import { AuthService } from '../auth.service'
+import { AuthService, User, Config } from '../auth.service'
 import { SchemaService } from '../schema.service'
 import { Definition, Highlight, SchemaType } from '../schema.model'
 import { SchemaState } from '../schema/state'
@@ -11,10 +12,13 @@ import { SchemaState } from '../schema/state'
   templateUrl: './schema-editor.component.html',
   styleUrls: ['./schema-editor.component.sass']
 })
-export class SchemaEditorComponent implements OnInit {
+export class SchemaEditorComponent implements OnInit, OnDestroy {
 
   auth:AuthService
   schema:SchemaService
+
+  //just need to subscribe to schema service
+  private schemaSubscription:Subscription
 
   state:SchemaState
 
@@ -22,7 +26,7 @@ export class SchemaEditorComponent implements OnInit {
 
   tabindex = { defs: 2 }
 
-  authorMode:boolean
+  userConfig:Config
 
   type:SchemaType
 
@@ -40,12 +44,15 @@ export class SchemaEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.schema.subscribe(() => {
-      let config = this.auth.getUserConfig()
-      this.authorMode = config.authorMode
+    this.schemaSubscription = this.schema.subscribe(() => {
+      this.userConfig = this.auth.getUserConfig()
       this.type = this.schema.model.type
-      console.log("INIT EDITOR:", this.authorMode)
-    })
+      //console.log("INIT EDITOR:", this.userConfig)
+    });
+  }
+
+  ngOnDestroy():void {
+    this.schemaSubscription.unsubscribe();
   }
 
 }

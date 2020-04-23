@@ -1,14 +1,14 @@
-import { Component, HostListener, EventEmitter, Output } from '@angular/core'
+import { Component, HostListener, EventEmitter, Input, Output } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { OnInit, OnDestroy, OnChanges } from '@angular/core'
+import { OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 
 import {Subscription} from 'rxjs/Subscription'
 import $ from "jquery"
 
-import { AuthService } from '../auth.service'
+import { Config } from '../auth.service'
 import { SchemaService } from '../schema.service'
-import { SchemaModel, Highlight } from '../schema.model'
+import { SchemaModel, SchemaType, Highlight } from '../schema.model'
 import { SchemaState } from './state'
 
 @Component({
@@ -19,7 +19,7 @@ import { SchemaState } from './state'
 export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
 
   route:ActivatedRoute
-  auth:AuthService
+
   service:SchemaService
 
   private subscription:Subscription
@@ -39,11 +39,14 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
 
   sel:string
 
-  @Output()
-  selected = new EventEmitter<Highlight>()
+  @Input()
+  config:Config
 
   @Output()
-  stateChanged = new EventEmitter<SchemaState>()
+  selected:EventEmitter<Highlight> = new EventEmitter<Highlight>()
+
+  @Output()
+  stateChanged:EventEmitter<SchemaState> = new EventEmitter<SchemaState>()
 
 
   onFocus($event) {
@@ -59,7 +62,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   onInput($event) {
     $event.target.select()
     if (this.input===".") {
-      this.setCell(".")
+      if (this.config.authorMode || !this.service.isType(SchemaType.Fixed))
+        this.setCell(".")
     } else if (this.input===" ") {
       this.setCell(" ")
       this.moveCursor(1)
@@ -78,9 +82,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     //console.log("INPUT: ", $event)
   }
 
-  constructor(route:ActivatedRoute, auth:AuthService, service:SchemaService) {
+  constructor(route:ActivatedRoute, service:SchemaService) {
     this.route = route
-    this.auth = auth
     this.service = service
     this.cells = this.service.create2DArray(999,999)
   }
@@ -88,29 +91,31 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   ngOnInit() {
     $(document).mousemove(event=>this.resize(event))
     $(document).mouseup(event=>this.prepareDrag(undefined, undefined, false, event))
-    this.subscription = this.service
-       .subscribe(item => {
-         this.service.populate(this.cells)
-         this.cellSize = this.auth.getUserConfig().cellSize
-         this.size = this.service.getSize()
-         this.reframe(this.size)
-         //this.selection = new Highlight(0, 0, 0, 0)
-         let sel = this.route.snapshot.paramMap.get('sel')
-         if (sel)
-           this.setCurrentHighlight(...sel.split('-').map(x=>parseInt(x)))
-         else
-           this.highlightCurrentWord()
-         $('.input').focus()
-         this.stateChanged.emit(this.state)
-       })
+  }
+
+  init() {
+    console.log("INIT", this.config)
+    this.service.populate(this.cells)
+    this.cellSize = this.config.cellSize
+    this.size = this.service.getSize()
+    //this.reframe(this.size)
+    //this.selection = new Highlight(0, 0, 0, 0)
+    let sel = this.route.snapshot.paramMap.get('sel')
+    if (sel)
+      this.setCurrentHighlight(...sel.split('-').map(x=>parseInt(x)))
+    else
+      this.highlightCurrentWord()
+    this.stateChanged.emit(this.state)
+    $('.input').focus()
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe()
+    //this.subscription.unsubscribe()
   }
 
-  ngOnChanges() {
-    console.log("SCHEMA CHANGE")
+  ngOnChanges(changes:SimpleChanges) {
+    console.log(changes)
+    this.init()
   }
 
   reframe(s) {
@@ -231,6 +236,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   setCell(value) {
+    if (this.service.isCellLocked(this.state.y, this.state.x))
+      return;
     let old = this.getCell()
     this.cells[this.state.y][this.state.x] = value
     this.service.setCell(this.state.y, this.state.x, value)

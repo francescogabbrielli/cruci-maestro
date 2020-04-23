@@ -84,8 +84,22 @@ export class SchemaService {
     return this.model.cells[i][j]
   }
 
+  setCell(...params:any[]):void
   setCell(i:number, j:number, value:string):void {
     this.model.cells[i][j] = value
+  }
+
+  /** Determines if a cell is "locked" to show up in the solution mode */
+  isCellLocked(i:number, j:number):boolean {
+    if (this.model.show instanceof Array)
+      for (let cell of this.model.show)
+        if (cell[0]===i && cell[1]===j)
+          return true
+    return false
+  }
+
+  isType(type:SchemaType):boolean {
+    return this.model.type===type
   }
 
   setDef(def:Definition) {
@@ -134,14 +148,9 @@ export class SchemaService {
   }
 
   load() {
+    console.log("LOADING", this.auth.getUserConfig().authorMode)
 
-    let load
-    //if (this.auth.getUserConfig().authorMode)
-      load = this.be.loadSchema(this.auth.getUserConfig().authorMode)
-    //else
-      //return
-
-    load.then((model) => {
+    this.be.loadSchema(this.auth.getUserConfig().authorMode).then((model) => {
 
       this.model = model
 
@@ -149,8 +158,11 @@ export class SchemaService {
         ? model.cells
         : this.create2DArray(...model.size))
 
+      if (model.show instanceof Array)
+        model.show.forEach(cell => this.setCell(...cell))
+
       this.defs = {}
-      for (let d of model["definitions"]) {
+      for (let d of model.definitions) {
         let h = new Highlight(d.highlight.start[0], d.highlight.start[1], d.highlight.end[0], d.highlight.end[1])
         let def = new Definition(h)
         def.desc = d.desc
@@ -168,7 +180,7 @@ export class SchemaService {
   }
 
   save() {
-    if (this.auth.isLogged()) {
+    if (this.auth.getUserConfig().authorMode) {
       let defs = []
       let unused = false
       for (let def of this.defsGenerator(true)) {
@@ -183,7 +195,7 @@ export class SchemaService {
           err => console.log(err)
         )
       if (unused)
-        alert("Attenzione! ci sono definizione non utilizzate. Non verrano salvate")
+        alert("Attenzione! ci sono definizioni non utilizzate. Non verrano salvate")
     }
     // client.auth.loginWithCredential(new UserPasswordCredential("demo@francescogabbrielli.it", "demo20"))
     // .then((login) => {

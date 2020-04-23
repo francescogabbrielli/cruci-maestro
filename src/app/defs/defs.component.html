@@ -7,6 +7,7 @@
       </span>
     </mat-label>
     <input [tabindex]="tabindex" name="def" matInput placeholder="...definition..."
+      [readonly]="!config.authorMode"
       [disabled]="selection.length()<=1"
       [(ngModel)]="def.desc"
       (keypress)="onChange()"

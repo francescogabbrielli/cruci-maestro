@@ -5,7 +5,7 @@
 import { Injectable } from '@angular/core'
 import { EJSON, ObjectId } from 'bson'
 
-import { SchemaModel } from './schema.model'
+import { SchemaModel, SchemaType } from './schema.model'
 
 import {
     Stitch, StitchAppClient,
@@ -79,7 +79,8 @@ export class BackendService {
         title: doc.title,
         type: doc.type,
         size: [doc.rows, doc.cols],
-        definitions: doc.definitions
+        definitions: doc.definitions,
+        show: doc.show
       }
       if (doc.cells !== undefined)
         model.cells = JSON.parse(atob(doc.cells))
@@ -95,6 +96,13 @@ export class BackendService {
       rows: model.size[0],
       cols: model.size[1]
     }}
+    if (m.type === SchemaType.Fixed) {
+      m.show = []
+      for (let i=0; i<model.size[0]; i++)
+        for (let j=0; j<model.size[1]; j++)
+          if (model.cells[i][j]==='.')
+            m.show.push([i,j,'.'])
+    }
     delete m['size']
     delete m['id']
     return this.db.collection('schemas').updateOne(

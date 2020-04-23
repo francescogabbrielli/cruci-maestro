@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy, OnChanges, Input } from '@angular/core'
-import {Subscription} from 'rxjs/Subscription'
+import { Component, OnInit, OnDestroy, OnChanges, SimpleChanges, Input } from '@angular/core'
+import { Subscription } from 'rxjs/Subscription'
 
+import { Config } from '../auth.service'
 import { SchemaService } from '../schema.service'
 import { Definition, Highlight } from '../schema.model'
 import { SchemaState } from '../schema/state'
@@ -18,6 +19,9 @@ export class DefsComponent implements OnInit, OnDestroy, OnChanges {
   subscription: Subscription
 
   @Input()
+  config:Config
+
+  @Input()
   state: SchemaState
 
   @Input()
@@ -33,17 +37,14 @@ export class DefsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
-    this.subscription = this.service.subscribe(item => {
-       if (item) this.ngOnChanges()
-     })
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe()
   }
 
-  ngOnChanges(): void {
-    this.def = this.service.getDef(this.selection)
+  ngOnChanges(changes:SimpleChanges): void {
+    if (changes.selection!==undefined)
+      this.def = this.service.getDef(this.selection)
   }
 
   onChange():void {

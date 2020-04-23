@@ -57,9 +57,5 @@ export interface SchemaModel {
   size:[number, number]
   cells?:string[][]
   definitions:Definition[]
-  show?:{
-    x:number,
-    y:number,
-    value:string
-  }
+  show?:[number,number,string][]
 }
