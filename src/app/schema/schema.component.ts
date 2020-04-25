@@ -29,6 +29,9 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   size:{rows:number, cols:number}
   cellSize:number
 
+  private event
+  private ie
+
   private resizing:{rows:number, cols:number}
   private lastReframe:number = 0
   private dragPosition:{x:number, y:number}
@@ -109,7 +112,7 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     if (i !== undefined && j !== undefined)
       this.moveCursor(j,i)
 
-    //stop dragging
+    //stop (previous) dragging
     if(this.dragging && !activate) {
       this.size = this.resizing
       if (this.state.x >= this.size.cols)
@@ -120,11 +123,15 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
       this.highlightCurrentWord()
     }
 
-    this.dragging = activate
-    this.dragPosition = {x: event.clientX, y: event.clientY}
+    //start dragging (only if author)
+    if (this.config.authorMode) {
+      this.dragging = activate
+      this.dragPosition = {x: event.clientX, y: event.clientY}
+      if (activate)
+        this.selection = this.service.noSelection
+    }
 
-    if (activate)
-      this.selection = this.service.noSelection
+    event.preventDefault()
 
   }
 
@@ -196,6 +203,10 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     this.stateChanged.emit(this.state)
 
     this.highlightCurrentWord()
+    this.fixFocus()
+  }
+
+  fixFocus() {
     $('.input').val(this.getCell()).select()
     setTimeout(() => $('.input').focus(), 100)
   }
@@ -224,18 +235,19 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  onFocus($event) {
+  onInputFocus($event) {
     this.state.focused = true
     $event.target.value = this.getCell()
     $event.target.select()
   }
 
-  onBlur() {
+  onInputBlur() {
     this.state.focused = false
   }
 
   onInput($event) {
     $event.target.select()
+    this.ie = "|"+this.input+"|"
 
     //blocks
     if (this.input===".") {
@@ -247,9 +259,11 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
       this.moveCursor(1)
     //delete and stay
     } else if (this.input==="") {
+      this.moveCursor(-1)
       this.setCell(" ")
-      $event.target.value = this.getCell()
-      $event.target.select()
+      this.fixFocus()
+      //$event.target.select()
+      //$event.target.value = this.getCell()
     //insert char if not on a block and move forward
     } else if (this.input.match(/^[a-z]$/)) {
       if (this.getCell()!=='.') {//do not overwrite a block just by typing lowercase
@@ -263,9 +277,15 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     //console.log("INPUT: ", $event)
   }
 
-  //special keys (mainly works on PC only)
+  onKeyDown(event) {
+    if (event.keyCode==8)
+       return false
+  }
+
+  // //special keys (mainly works on PC only)
   @HostListener('window:keydown', ['$event'])
   keyDown(event: KeyboardEvent) {
+    this.event = event.key+"-"+event.keyCode
     if (!this.state.focused)
       return true
     //console.log(event.key)
@@ -293,8 +313,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
       this.moveCursor(this.size.cols-1, this.size.rows-1)
     //delete char and move backward
     } else if (event.keyCode==8 || event.key === "Backspace") {
-      this.setCell(" ")
       this.moveCursor(-1)
+      this.setCell(" ")
       return false
     }
   }

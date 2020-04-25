@@ -52,18 +52,24 @@ export class DefinitionListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.init()
     this.subscription = this.service
-       .subscribe(item => {
-         let size = this.service.getSize()
-         this.defs = [
-           new DefinitionBlock(true, size.rows),
-           new DefinitionBlock(false, size.cols)
-         ]
-         for (let def of this.service.defsGenerator()) {
-           let block = this.defs[def.highlight.isHorizontal() ? 0 : 1]
-           block.add(def)
-         }
+       .subscribe((loading:boolean) => {
+         if (!loading)
+          this.init()
        })
+  }
+
+  init() {
+    let size = this.service.getSize()
+    this.defs = [
+      new DefinitionBlock(true, size.rows),
+      new DefinitionBlock(false, size.cols)
+    ]
+    for (let def of this.service.defsGenerator()) {
+      let block = this.defs[def.highlight.isHorizontal() ? 0 : 1]
+      block.add(def)
+    }
   }
 
   ngOnDestroy() {

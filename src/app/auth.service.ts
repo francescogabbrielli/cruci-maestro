@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs/BehaviorSubject'
 import { skip } from 'rxjs/operators'
 
+import { SchemaType } from './schema.model'
 import { BackendService } from './backend.service'
 
 
 export interface Config {
   cellSize:number
-  solutionType:string
+  solutionType:SchemaType
   authorMode:boolean
 }
 
@@ -37,7 +38,7 @@ export class AuthService {
     this.user = new BehaviorSubject(null)
     this.defaultConfig = {
       cellSize: 28,
-      solutionType: "fixed",
+      solutionType: SchemaType.Fixed,
       authorMode: false
     }
     //this.user.subscribe((v) => console.log("USER", v))

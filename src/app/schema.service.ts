@@ -8,11 +8,6 @@ import { BackendService } from './backend.service'
 import { SchemaModel, Definition, Highlight, SchemaType } from './schema.model'
 
 
-interface DefArray {
-  [index:string]:Definition
-}
-
-
 @Injectable({
   providedIn: 'root'
 })
@@ -23,7 +18,7 @@ export class SchemaService {
 
   model:SchemaModel
 
-  private defs:DefArray = {}
+  private defs:{[index:string]:Definition} = {}
   private locked:{[index:string]:boolean} = {}
 
   private loading:BehaviorSubject<boolean>
@@ -206,7 +201,7 @@ export class SchemaService {
 
   save() {
     if (this.auth.getUserConfig().authorMode) {
-      this.model.type = SchemaType[this.auth.getUserConfig().solutionType]//TODO: just use schema model
+      this.model.type = this.auth.getUserConfig().solutionType//TODO: just use schema model
       let defs = []
       let unused = false
       for (let def of this.defsGenerator(true)) {
