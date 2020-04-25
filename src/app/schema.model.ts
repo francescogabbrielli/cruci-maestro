@@ -36,12 +36,13 @@ export class Definition {
   isnew:boolean
   highlight?:Highlight
 
-  constructor(highlight:Highlight) {
-    this.desc = ""
-    this.unused = false
-    this.isnew = true
+  constructor(highlight:Highlight, data?:any) {
+    this.desc = data!==undefined ? data.desc : ""
+    this.unused = data!==undefined ? data.unused : false
+    this.isnew = data===undefined
     this.highlight = highlight
   }
+
 }
 
 export enum SchemaType {
@@ -57,5 +58,6 @@ export interface SchemaModel {
   size:[number, number]
   cells?:string[][]
   definitions:Definition[]
-  show?:[number,number,string][]
+  blocks?:[number,number,string][]
+  hints?:[number,number,string][]
 }

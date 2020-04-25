@@ -80,7 +80,7 @@ export class BackendService {
         type: doc.type,
         size: [doc.rows, doc.cols],
         definitions: doc.definitions,
-        show: doc.show
+        blocks: doc.blocks
       }
       if (doc.cells !== undefined)
         model.cells = JSON.parse(atob(doc.cells))
@@ -94,14 +94,15 @@ export class BackendService {
     let m = {...model, ...{
       cells: btoa(JSON.stringify(model.cells)),
       rows: model.size[0],
-      cols: model.size[1]
+      cols: model.size[1],
     }}
+    delete m['blocks']
     if (m.type === SchemaType.Fixed) {
-      m.show = []
+      m.blocks = []
       for (let i=0; i<model.size[0]; i++)
         for (let j=0; j<model.size[1]; j++)
           if (model.cells[i][j]==='.')
-            m.show.push([i,j,'.'])
+            m.blocks.push([i,j,'.'])
     }
     delete m['size']
     delete m['id']

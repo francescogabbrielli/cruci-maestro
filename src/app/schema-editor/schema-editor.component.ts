@@ -41,13 +41,18 @@ export class SchemaEditorComponent implements OnInit, OnDestroy {
   constructor(auth:AuthService, schema: SchemaService) {
     this.auth = auth
     this.schema = schema
+    this.selection = schema.noSelection
+    this.userConfig = auth.getUserConfig()
+    this.type = schema.model.type
   }
 
   ngOnInit(): void {
-    this.schemaSubscription = this.schema.subscribe(() => {
-      this.userConfig = this.auth.getUserConfig()
+    this.schemaSubscription = this.schema.subscribe(loading => {
+      if (loading)
+        return
+      this.userConfig = {...this.auth.getUserConfig()}
       this.type = this.schema.model.type
-      //console.log("INIT EDITOR:", this.userConfig)
+      console.log("SCHEMA CHANGE", this.userConfig)
     });
   }
 

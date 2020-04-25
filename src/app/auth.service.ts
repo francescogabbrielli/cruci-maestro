@@ -68,7 +68,7 @@ export class AuthService {
     return this.be.login(username, password).then(
       (user:User) => {
         localStorage.setItem('currentUser', JSON.stringify(user))
-        console.log("LOGIN", user)
+        //console.log("LOGIN", user)
         this.user.next(user)
         return true
       }

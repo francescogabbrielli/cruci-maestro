@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs/BehaviorSubject'
+import { skip } from 'rxjs/operators'
 
 import { AuthService } from './auth.service'
 import { BackendService } from './backend.service'
@@ -22,9 +23,10 @@ export class SchemaService {
 
   model:SchemaModel
 
-  defs:DefArray
+  private defs:DefArray = {}
+  private locked:{[index:string]:boolean} = {}
 
-  private updated:BehaviorSubject<boolean>
+  private loading:BehaviorSubject<boolean>
 
   readonly noSelection:Highlight = new Highlight(-1,-1,-1,-1)
 
@@ -34,24 +36,23 @@ export class SchemaService {
 
     this.model = {
       title: '',
-      type: SchemaType.Free,
+      type: SchemaType.Fixed,
       definitions: [],
       size: [10, 10]
     }
 
-    this.defs = {}
     this.setCells(this.create2DArray(...this.model.size))
 
-    this.updated = new BehaviorSubject<boolean>(false)
-    this.auth.subscribe(item => {
-      console.log("USER CHANGED", item )
+    this.loading = new BehaviorSubject<boolean>(false)
+    this.auth.subscribe(user => {
+      console.log("USER CHANGED", user )
       this.load()
     })
     //this.updated.subscribe((v) => console.log("UPDATED", v))
   }
 
   subscribe(fn) {
-    return this.updated.subscribe(fn)
+    return this.loading.pipe(skip(1)).subscribe(fn)
   }
 
   create2DArray(...dimensions:number[]):string[][]
@@ -91,15 +92,30 @@ export class SchemaService {
 
   /** Determines if a cell is "locked" to show up in the solution mode */
   isCellLocked(i:number, j:number):boolean {
-    if (this.model.show instanceof Array)
-      for (let cell of this.model.show)
-        if (cell[0]===i && cell[1]===j)
-          return true
-    return false
+    return this.locked[i+"-"+j]===true
+  }
+
+  setHint(i:number, j:number, set:boolean):void {
+    let k:string = i+"-"+j
+    this.locked[k] = set
+    let found = -1
+    if (!(this.model.hints instanceof Array))
+      this.model.hints = []
+    for (let index=0; found<0 && index<this.model.hints.length; index++)
+      if (k === this.model.hints[0]+"-"+this.model.hints[1])
+        found = index
+    if (!set && found>=0)
+      this.model.hints.splice(found, 1)
+    else if (set && found<0)
+      this.model.hints.push([i, j, this.getCell(i,j)])
   }
 
   isType(type:SchemaType):boolean {
     return this.model.type===type
+  }
+
+  setType(type:SchemaType):void {
+    this.model.type = type
   }
 
   setDef(def:Definition) {
@@ -147,40 +163,50 @@ export class SchemaService {
       }
   }
 
+  isLoading() {
+    return this.loading.value
+  }
+
   load() {
-    console.log("LOADING", this.auth.getUserConfig().authorMode)
+
+    this.loading.next(true)
+    //console.log("LOADING", this.auth.getUserConfig().authorMode)
 
     this.be.loadSchema(this.auth.getUserConfig().authorMode).then((model) => {
 
       this.model = model
 
+      //cells
       this.setCells(this.auth.getUserConfig().authorMode
         ? model.cells
         : this.create2DArray(...model.size))
 
-      if (model.show instanceof Array)
-        model.show.forEach(cell => this.setCell(...cell))
+      // locked cells
+      this.locked = {}
+      let array = this.model.hints instanceof Array ? this.model.hints : []
+      if (!this.auth.getUserConfig().authorMode && this.model.type===SchemaType.Fixed && this.model.blocks instanceof Array)
+        array = array.concat(this.model.blocks)
+      for (let cell of array) {
+        this.locked[cell[0]+"-"+cell[1]] = true
+        this.setCell(...cell)
+      }
 
+      //definitions
       this.defs = {}
       for (let d of model.definitions) {
         let h = new Highlight(d.highlight.start[0], d.highlight.start[1], d.highlight.end[0], d.highlight.end[1])
-        let def = new Definition(h)
-        def.desc = d.desc
-        def.unused = d.unused
-        def.isnew = false
-        this.defs[h.toString()] = def
+        this.defs[h.toString()] = new Definition(h, d)
       }
 
-      this.updated.next(true)
-
-    }).catch(err => {
-      console.error(err)
     })
+    .catch(err => console.error(err))
+    .finally(() => this.loading.next(false))
 
   }
 
   save() {
     if (this.auth.getUserConfig().authorMode) {
+      this.model.type = SchemaType[this.auth.getUserConfig().solutionType]//TODO: just use schema model
       let defs = []
       let unused = false
       for (let def of this.defsGenerator(true)) {

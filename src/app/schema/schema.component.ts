@@ -48,40 +48,6 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   @Output()
   stateChanged:EventEmitter<SchemaState> = new EventEmitter<SchemaState>()
 
-
-  onFocus($event) {
-    this.state.focused = true
-    $event.target.value = this.getCell()
-    $event.target.select()
-  }
-
-  onBlur() {
-    this.state.focused = false
-  }
-
-  onInput($event) {
-    $event.target.select()
-    if (this.input===".") {
-      if (this.config.authorMode || !this.service.isType(SchemaType.Fixed))
-        this.setCell(".")
-    } else if (this.input===" ") {
-      this.setCell(" ")
-      this.moveCursor(1)
-    } else if (this.input==="") {
-      this.setCell(" ")
-      $event.target.value = this.getCell()
-      $event.target.select()
-    } else if (this.input.match(/^[a-z]$/)) {
-      if (this.getCell()!=='.') {//do not overwrite a block just by typing lowercase
-        this.setCell(this.input.toUpperCase())
-        this.moveCursor(1)
-      }
-    } else if (this.input.match(/^[A-Z]$/)) {
-      this.setCell(this.input.toUpperCase())
-    }
-    //console.log("INPUT: ", $event)
-  }
-
   constructor(route:ActivatedRoute, service:SchemaService) {
     this.route = route
     this.service = service
@@ -89,15 +55,18 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit() {
+    //console.log("ON INIT")
     $(document).mousemove(event=>this.resize(event))
     $(document).mouseup(event=>this.prepareDrag(undefined, undefined, false, event))
   }
 
   init() {
-    console.log("INIT", this.config)
-    this.service.populate(this.cells)
     this.cellSize = this.config.cellSize
     this.size = this.service.getSize()
+    if (this.service.isLoading())
+      return
+    this.service.populate(this.cells)
+    //console.log("INIT SCHEMA")
     //this.reframe(this.size)
     //this.selection = new Highlight(0, 0, 0, 0)
     let sel = this.route.snapshot.paramMap.get('sel')
@@ -114,7 +83,7 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes:SimpleChanges) {
-    console.log(changes)
+    //console.log("CHANGES", changes, this.service.loading)
     this.init()
   }
 
@@ -255,7 +224,46 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  //repeatable keys (PC only?)
+  onFocus($event) {
+    this.state.focused = true
+    $event.target.value = this.getCell()
+    $event.target.select()
+  }
+
+  onBlur() {
+    this.state.focused = false
+  }
+
+  onInput($event) {
+    $event.target.select()
+
+    //blocks
+    if (this.input===".") {
+      if (this.config.authorMode || !this.service.isType(SchemaType.Fixed))
+        this.setCell(".")
+    //delete and go forward
+    } else if (this.input===" ") {
+      this.setCell(" ")
+      this.moveCursor(1)
+    //delete and stay
+    } else if (this.input==="") {
+      this.setCell(" ")
+      $event.target.value = this.getCell()
+      $event.target.select()
+    //insert char if not on a block and move forward
+    } else if (this.input.match(/^[a-z]$/)) {
+      if (this.getCell()!=='.') {//do not overwrite a block just by typing lowercase
+        this.setCell(this.input.toUpperCase())
+        this.moveCursor(1)
+      }
+    //force insert char and stay
+    } else if (this.input.match(/^[A-Z]$/)) {
+      this.setCell(this.input)
+    }
+    //console.log("INPUT: ", $event)
+  }
+
+  //special keys (mainly works on PC only)
   @HostListener('window:keydown', ['$event'])
   keyDown(event: KeyboardEvent) {
     if (!this.state.focused)
@@ -283,6 +291,7 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
       this.moveCursor(0, 0)
     } else if (event.key === "End") {
       this.moveCursor(this.size.cols-1, this.size.rows-1)
+    //delete char and move backward
     } else if (event.keyCode==8 || event.key === "Backspace") {
       this.setCell(" ")
       this.moveCursor(-1)
