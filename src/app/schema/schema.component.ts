@@ -18,9 +18,11 @@ import { SchemaState } from './state'
 })
 export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
 
-  route:ActivatedRoute
+  readonly touchDevice = navigator.maxTouchPoints || 'ontouchstart' in document.documentElement
 
-  service:SchemaService
+  private route:ActivatedRoute
+
+  private service:SchemaService
 
   private subscription:Subscription
 
@@ -29,16 +31,14 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   size:{rows:number, cols:number}
   cellSize:number
 
-  private event
-  private ie
-
   private resizing:{rows:number, cols:number}
   private lastReframe:number = 0
   private dragPosition:{x:number, y:number}
   private dragging:boolean = false
 
-  state: SchemaState = {x:0, y:0, horizontal: true, focused: false}
-  selection: Highlight = new Highlight(0, 0, 0, 0)
+  model: SchemaModel
+  state: SchemaState
+  selection: Highlight
 
   sel:string
 
@@ -55,6 +55,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     this.route = route
     this.service = service
     this.cells = this.service.create2DArray(999,999)
+    this.state = {x:0, y:0, horizontal:true, focused:false}
+    this.selection = this.service.getSelection()
   }
 
   ngOnInit() {
@@ -64,19 +66,13 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   init() {
+    this.model = this.service.model
     this.cellSize = this.config.cellSize
     this.size = this.service.getSize()
     if (this.service.isLoading())
       return
     this.service.populate(this.cells)
-    //console.log("INIT SCHEMA")
-    //this.reframe(this.size)
-    //this.selection = new Highlight(0, 0, 0, 0)
-    let sel = this.route.snapshot.paramMap.get('sel')
-    if (sel)
-      this.setCurrentHighlight(...sel.split('-').map(x=>parseInt(x)))
-    else
-      this.highlightCurrentWord()
+    this.setCurrentHighlight(this.service.getSelection())
     this.stateChanged.emit(this.state)
     $('.input').focus()
   }
@@ -152,16 +148,22 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  setCurrentHighlight(...coords:number[])
-  setCurrentHighlight(x0:number, y0:number, x1:number, y1:number) {
-    this.state.horizontal = y0===y1
-    // console.log(x0, y0)
+  setSelection(h:Highlight) {
+    this.selection = h
+    this.service.setSelection(h)
+    this.selected.emit(h)
+  }
+
+  setCurrentHighlight(selection:Highlight):void {
+    this.state.horizontal = selection.isHorizontal()
+    let [x0, y0] =  [...selection.start]
+    let [x1, y1] =  [...selection.end]
     this.moveCursor(x0, y0)
     if (this.selection.start[0]!==x0 || this.selection.start[1]!==y0
       || this.selection.end[0]!==x1 || this.selection.end[1]!==y1) {
-      this.selection = new Highlight(x0, y0, x1, y1)
-      this.selection.unused = true
-      this.selected.emit(this.selection)
+      let sel = new Highlight(x0, y0, x1, y1)
+      sel.unused = true
+      this.setSelection(sel)
     }
   }
 
@@ -184,10 +186,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
         end = this.state.horizontal ? x : y
       else break
     let highlight = this.getCurrentHighlight(start, end)
-    if (!this.selection.equals(highlight)) {
-      this.selection = highlight
-      this.selected.emit(this.selection)
-    }
+    if (!this.selection.equals(highlight))
+      this.setSelection(highlight)
   }
 
   moveCursor(x:number, y?:number) {
@@ -247,7 +247,6 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
 
   onInput($event) {
     $event.target.select()
-    this.ie = "|"+this.input+"|"
 
     //blocks
     if (this.input===".") {
@@ -259,7 +258,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
       this.moveCursor(1)
     //delete and stay
     } else if (this.input==="") {
-      this.moveCursor(-1)
+      if (this.touchDevice)
+        this.moveCursor(-1)
       this.setCell(" ")
       this.fixFocus()
       //$event.target.select()
@@ -285,7 +285,6 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   // //special keys (mainly works on PC only)
   @HostListener('window:keydown', ['$event'])
   keyDown(event: KeyboardEvent) {
-    this.event = event.key+"-"+event.keyCode
     if (!this.state.focused)
       return true
     //console.log(event.key)

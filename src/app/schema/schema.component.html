@@ -2,7 +2,7 @@
     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
     (focus)="onInputFocus($event)" (blur)="onInputBlur()" (input)="onInput($event)" (keydown)="onKeyDown($event)">
   <table class="schema noselect">
-    <tr *ngFor="let row of service.model.cells; index as i; last as lastRow">
+    <tr *ngFor="let row of model.cells; index as i; last as lastRow">
       <td *ngFor="let cell of row; index as j; last as lastColumn"
         (mousedown)="prepareDrag(i, j, lastRow && lastColumn, $event)"
         (dblclick)="toggleOrientation()">
@@ -30,6 +30,5 @@
       </td>
     </tr>
   </table>
-  <span>{{ie}} / {{event}} = [{{input}}]</span>
   <!--defs [state]="state" [selection]="selection"></defs>
   <span tabindex="3" onFocus="document.querySelector('.input').focus()"></span-->

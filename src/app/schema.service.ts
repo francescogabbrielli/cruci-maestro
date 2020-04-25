@@ -24,6 +24,7 @@ export class SchemaService {
   private loading:BehaviorSubject<boolean>
 
   readonly noSelection:Highlight = new Highlight(-1,-1,-1,-1)
+  private selection:Highlight = this.noSelection
 
   constructor(auth:AuthService, be:BackendService) {
     this.auth = auth
@@ -48,6 +49,14 @@ export class SchemaService {
 
   subscribe(fn) {
     return this.loading.pipe(skip(1)).subscribe(fn)
+  }
+
+  setSelection(sel:Highlight):void {
+    this.selection = sel
+  }
+
+  getSelection():Highlight {
+    return this.selection
   }
 
   create2DArray(...dimensions:number[]):string[][]
@@ -169,6 +178,7 @@ export class SchemaService {
 
     this.be.loadSchema(this.auth.getUserConfig().authorMode).then((model) => {
 
+      //this.selection = this.noSelection
       this.model = model
 
       //cells

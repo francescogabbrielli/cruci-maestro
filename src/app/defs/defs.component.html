@@ -2,7 +2,7 @@
 <form class="def-form" >
   <mat-form-field class="def-input">
     <mat-label>
-      <span *ngIf="selection.length()>1">
+      <span *ngIf="selection.length()>1 && state !== undefined">
         {{selection.length()}} letters - {{state.horizontal ? "Horizontal" : "Vertical"}}
       </span>
     </mat-label>

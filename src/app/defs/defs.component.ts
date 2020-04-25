@@ -22,15 +22,15 @@ export class DefsComponent implements OnInit, OnDestroy, OnChanges {
   config:Config
 
   @Input()
-  state: SchemaState
+  state:SchemaState
 
   @Input()
-  selection: Highlight
+  selection:Highlight
 
   @Input()
-  tabindex: number
+  tabindex:number
 
-  def: Definition
+  def:Definition
 
   constructor(service: SchemaService) {
     this.service = service
@@ -39,12 +39,12 @@ export class DefsComponent implements OnInit, OnDestroy, OnChanges {
   ngOnInit(): void {
   }
 
-  ngOnDestroy(): void {
-  }
-
   ngOnChanges(changes:SimpleChanges): void {
     if (changes.selection!==undefined)
       this.def = this.service.getDef(this.selection)
+  }
+  
+  ngOnDestroy(): void {
   }
 
   onChange():void {

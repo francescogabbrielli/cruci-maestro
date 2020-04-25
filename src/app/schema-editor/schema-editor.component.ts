@@ -41,7 +41,8 @@ export class SchemaEditorComponent implements OnInit, OnDestroy {
   constructor(auth:AuthService, schema: SchemaService) {
     this.auth = auth
     this.schema = schema
-    this.selection = schema.noSelection
+    this.selection = schema.getSelection()
+    console.log(this.selection)
     this.userConfig = auth.getUserConfig()
     this.type = schema.model.type
   }

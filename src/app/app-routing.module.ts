@@ -8,7 +8,6 @@ import { LoginComponent } from './login/login.component'
 const routes: Routes = [
   {path: '', redirectTo: '/schema', pathMatch: 'full' },
   {path: 'schema', component: SchemaEditorComponent},
-//  {path: 'schema/:sel', component: SchemaComponent},
   {path: 'definitions', component: DefinitionListComponent},
   {path: 'settings', component: SettingsComponent},
   {path: 'login', component: LoginComponent}

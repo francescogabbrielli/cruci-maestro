@@ -5,6 +5,7 @@ import { map, shareReplay } from 'rxjs/operators'
 
 import { AuthService } from './auth.service'
 import { SchemaService } from './schema.service'
+import { SchemaType } from './schema.model'
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,7 @@ export class AppComponent {
 
   auth:AuthService
   schema:SchemaService
+  obliged:SchemaType = SchemaType.Obliged
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(

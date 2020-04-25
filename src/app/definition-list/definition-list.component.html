@@ -1,11 +1,25 @@
+<div *ngIf="visible">
 <div class="definition-block" *ngFor="let d of defs">
   <h3>{{d.title}}</h3>
   <ol>
     <li *ngFor="let line of d.lines">
-      <span *ngFor="let def of line; last as last">
-        <a routerLink="/schema/{{def.highlight}}" title="{{def.unused ? 'Definition not used' : ''}}" [ngClass]="{'definition': true, 'unused': def.unused}">{{def.desc}}</a>
-        <span *ngIf="!last"> - </span>
-      </span>
+      <div *ngIf="!single; else elseBlock">
+        <span *ngFor="let def of line; last as last">
+          <a routerLink="/schema" title="{{def.unused ? 'Definition not used' : ''}}"
+          (click) = "setSelection(def.highlight)"
+          [ngClass]="{'definition': true, 'unused': def.unused}">{{def.desc}}</a>
+          <span *ngIf="!last"> - </span>
+        </span>
+      </div>
+      <ng-template #elseBlock>
+        <a routerLink="/schema" class="definition"
+          (click) = "setLineSelection(line)">
+          <span *ngFor="let def of line; last as last">
+            {{def.desc}}<span *ngIf="!last"> - </span>
+          </span>
+        </a>
+      </ng-template>
     </li>
   </ol>
+</div>
 </div>

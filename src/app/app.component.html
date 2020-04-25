@@ -5,13 +5,17 @@
       [opened]="(isHandset$ | async) === false">
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
-      <a mat-list-item (click)="drawer.mode==='over' && drawer.close()" routerLink="/schema" routerLinkActive="selected-route">
+      <a mat-list-item (click)="drawer.mode==='over' && drawer.close()"
+        routerLink="/schema" routerLinkActive="selected-route">
         <mat-icon aria-hidden="false" aria-label="Example home icon">grid_on</mat-icon>&nbsp;Schema
       </a>
-      <a mat-list-item (click)="drawer.mode==='over' && drawer.close()" routerLink="/definitions" routerLinkActive="selected-route">
+      <a *ngIf="auth.getUserConfig().authorMode || !schema.isType(obliged)"
+        mat-list-item (click)="drawer.mode==='over' && drawer.close()"
+        routerLink="/definitions" routerLinkActive="selected-route">
         <mat-icon aria-hidden="false" aria-label="Example home icon">list</mat-icon>&nbsp;Definitions
       </a>
-      <a mat-list-item (click)="drawer.mode==='over' && drawer.close()" routerLink="/settings" routerLinkActive="selected-route">
+      <a mat-list-item (click)="drawer.mode==='over' && drawer.close()"
+        routerLink="/settings" routerLinkActive="selected-route">
         <mat-icon aria-hidden="false" aria-label="Example home icon">settings</mat-icon>&nbsp;Settings
       </a>
     </mat-nav-list>
