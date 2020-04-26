@@ -135,9 +135,14 @@ export class SchemaService {
     }
   }
 
-  getDef(selection:Highlight):Definition {
-    selection = selection || this.noSelection
-    return this.defs[selection.toString()] || new Definition(selection)
+  /**
+   * Restituisce tutte le difinizioni contenute nella selezione passata
+   */
+  getDefs(selection?:Highlight):Definition[] {
+    selection = selection || this.selection
+    return this.auth.getUserConfig().authorMode || this.isType(SchemaType.Fixed)
+      ? [this.defs[selection.toString()] || new Definition(selection)]
+      : this.model.definitions.filter(def => selection.containsAll(def.highlight))
   }
 
   *defsGenerator(sorted = false):IterableIterator<Definition> {
@@ -198,9 +203,12 @@ export class SchemaService {
 
       //definitions
       this.defs = {}
+      let i = 0
       for (let d of model.definitions) {
         let h = new Highlight(d.highlight.start[0], d.highlight.start[1], d.highlight.end[0], d.highlight.end[1])
-        this.defs[h.toString()] = new Definition(h, d)
+        d = new Definition(h, d)
+        this.defs[h.toString()] = d
+        this.model.definitions[i++] = d
       }
 
     })

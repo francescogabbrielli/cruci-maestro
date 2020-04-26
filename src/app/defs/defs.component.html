@@ -1,18 +1,30 @@
 <br/>
-<form class="def-form" >
-  <mat-form-field class="def-input">
-    <mat-label>
-      <span *ngIf="selection.length()>1 && state !== undefined">
-        {{selection.length()}} letters - {{state.horizontal ? "Horizontal" : "Vertical"}}
-      </span>
-    </mat-label>
-    <input [tabindex]="tabindex" name="def" matInput placeholder="...definition..."
-      [readonly]="!config.authorMode"
-      [disabled]="selection.length()<=1"
-      [(ngModel)]="def.desc"
-      (keypress)="onChange()"
-      (paste)="onChange()"
-      (input)="onChange()">
-  </mat-form-field>
-</form>
-<span [tabindex]="tabindex+1" onFocus="document.querySelector('.input').focus()"></span>
+
+<div *ngIf="config.authorMode; else elseBlock">
+
+  <form class="def-form" >
+    <mat-form-field class="def-input">
+      <mat-label>
+        <span *ngIf="selection.length()>1 && state !== undefined">
+          {{selection.length()}} letters - {{state.horizontal ? "Horizontal" : "Vertical"}}
+        </span>
+      </mat-label>
+      <input [tabindex]="tabindex" name="def" matInput placeholder="...definition..."
+        [readonly]="!config.authorMode"
+        [disabled]="selection.length()<=1"
+        [(ngModel)]="defs[0].desc"
+        (keypress)="onChange()"
+        (paste)="onChange()"
+        (input)="onChange()">
+    </mat-form-field>
+  </form>
+  <span [tabindex]="tabindex+1" onFocus="document.querySelector('.input').focus()"></span>
+
+</div><ng-template #elseBlock>
+
+  <span class="label" *ngIf="selection.length()>1 && state !== undefined">
+      {{selection.length()}} letters - {{state.horizontal ? "Horizontal" : "Vertical"}}
+  </span>
+  <p class="definition"><span *ngFor="let def of defs; last as last">{{def.desc}}<span *ngIf="!last"> - </span></span></p>
+
+</ng-template>

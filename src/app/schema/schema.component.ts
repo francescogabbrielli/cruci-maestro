@@ -174,17 +174,21 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     }
 
   highlightCurrentWord() {
-    let start, end
-    let incX = this.state.horizontal ? 1 : 0
-    let incY = this.state.horizontal ? 0 : 1
-    for (let x=this.state.x, y=this.state.y; x>=0 && y>=0; x-=incX, y-=incY)
-      if (this.cells[y][x]!=='.')
-        start = this.state.horizontal ? x : y
-      else break
-    for (let x=this.state.x, y=this.state.y; x<this.size.cols && y<this.size.rows; x+=incX, y+=incY)
-      if (this.cells[y][x]!=='.')
-        end = this.state.horizontal ? x : y
-      else break
+    let start=0, end=this.state.horizontal ? this.size.cols-1 : this.size.rows-1
+    if (this.config.authorMode || this.service.isType(SchemaType.Fixed)) {
+      start = undefined
+      end = undefined
+      let incX = this.state.horizontal ? 1 : 0
+      let incY = this.state.horizontal ? 0 : 1
+      for (let x=this.state.x, y=this.state.y; x>=0 && y>=0; x-=incX, y-=incY)
+        if (this.cells[y][x]!=='.')
+          start = this.state.horizontal ? x : y
+        else break
+      for (let x=this.state.x, y=this.state.y; x<this.size.cols && y<this.size.rows; x+=incX, y+=incY)
+        if (this.cells[y][x]!=='.')
+          end = this.state.horizontal ? x : y
+        else break
+    }
     let highlight = this.getCurrentHighlight(start, end)
     if (!this.selection.equals(highlight))
       this.setSelection(highlight)

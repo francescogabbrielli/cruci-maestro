@@ -1,6 +1,6 @@
 <schema [config]="userConfig"
   (stateChanged)="onStateChanged($event)" (selected)="onSelected($event)">
 </schema>
-<defs [config]="userConfig"
-  [state]="state" [selection]="selection" [tabindex]="tabindex.defs">
+<defs [config]="userConfig" *ngIf="type!=='obliged'"
+  [state]="state" [type]="type" [selection]="selection" [tabindex]="tabindex.defs">
 </defs>

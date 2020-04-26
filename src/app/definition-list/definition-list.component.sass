@@ -1,3 +1,6 @@
+@import '~@angular/material/theming'
+@import '../theme.sass'
+
 .definition-block
   display: inline-block
   width: 50%
@@ -11,4 +14,4 @@
   text-decoration: underline
 
 .definition.unused
-  color: red
+  color: map-get($warn, 400)

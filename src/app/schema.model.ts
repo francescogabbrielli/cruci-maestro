@@ -22,6 +22,9 @@ export class Highlight {
   contains(x: number, y: number) {
     return (this.start[0] === x && this.end[0] === x && y >= this.start[1] && y <= this.end[1]) || (this.start[1] === y && this.end[1] === y && x >= this.start[0] && x <= this.end[0])
   }
+  containsAll(h:Highlight) {
+    return this.contains(h.start[0], h.start[1]) && this.contains(h.end[0], h.end[1])
+  }
   length():number {
     return this.end[1]-this.start[1] + this.end[0]-this.start[0] + 1 || 0
   }

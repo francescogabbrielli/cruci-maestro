@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs/Subscription'
 
 import { Config } from '../auth.service'
 import { SchemaService } from '../schema.service'
-import { Definition, Highlight } from '../schema.model'
+import { Definition, Highlight, SchemaType } from '../schema.model'
 import { SchemaState } from '../schema/state'
 
 
@@ -22,6 +22,9 @@ export class DefsComponent implements OnInit, OnDestroy, OnChanges {
   config:Config
 
   @Input()
+  type:SchemaType
+
+  @Input()
   state:SchemaState
 
   @Input()
@@ -30,7 +33,7 @@ export class DefsComponent implements OnInit, OnDestroy, OnChanges {
   @Input()
   tabindex:number
 
-  def:Definition
+  defs:Definition[]
 
   constructor(service: SchemaService) {
     this.service = service
@@ -41,13 +44,15 @@ export class DefsComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes:SimpleChanges): void {
     if (changes.selection!==undefined)
-      this.def = this.service.getDef(this.selection)
+      this.defs = this.service.getDefs(this.selection)
+    //console.log(this.defs)
   }
-  
+
   ngOnDestroy(): void {
   }
 
   onChange():void {
-    this.service.setDef(this.def)
+    this.service.setDef(this.defs[0])
   }
+
 }

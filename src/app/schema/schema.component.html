@@ -23,9 +23,9 @@
               'word-sv': !state.horizontal && selection.startsWith(j,i),
               'word-v': !state.horizontal && selection.contains(j,i),
               'word-ev': !state.horizontal && selection.endsWith(j,i),
-              'focused': state.focused && cell!=='.'
+              'focused': state.focused
               }">
-          {{cell}}
+          {{cell!=='.'?cell:''}}
         </div>
       </td>
     </tr>
