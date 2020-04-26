@@ -1,25 +1,43 @@
 <div *ngIf="visible">
-<div class="definition-block" *ngFor="let d of defs">
-  <h3>{{d.title}}</h3>
-  <ol>
-    <li *ngFor="let line of d.lines">
-      <div *ngIf="!single; else elseBlock">
-        <span *ngFor="let def of line; last as last">
-          <a routerLink="/schema" title="{{def.unused ? 'Definition not used' : ''}}"
-          (click) = "setSelection(def.highlight)"
-          [ngClass]="{'definition': true, 'unused': def.unused}">{{def.desc}}</a>
-          <span *ngIf="!last"> - </span>
-        </span>
-      </div>
-      <ng-template #elseBlock>
-        <a routerLink="/schema" class="definition"
-          (click) = "setLineSelection(line)">
+  <div class="definition-block" *ngFor="let d of defs; index as i"
+    [ngClass]="{'over': random, 'hidden': i!==show}">
+    <h3><a href="javascript:void(0)" (click)="toggleBlock()">{{d.title}}</a></h3>
+
+    <ol *ngIf="!random; else elseBlock">
+
+      <li *ngFor="let line of d.lines">
+
+        <div *ngIf="!single; else elseLine">
+
           <span *ngFor="let def of line; last as last">
-            {{def.desc}}<span *ngIf="!last"> - </span>
+            <a routerLink="/schema" title="{{def.unused ? 'Definition not used' : ''}}"
+            (click) = "setSelection(def.highlight)"
+            [ngClass]="{'definition': true, 'unused': def.unused}">{{def.desc}}</a>
+            <span *ngIf="!last"> - </span>
           </span>
-        </a>
-      </ng-template>
-    </li>
-  </ol>
-</div>
+
+        </div><ng-template #elseLine>
+
+          <a routerLink="/schema" class="definition"
+            (click) = "setLineSelection(line)">
+            <span *ngFor="let def of line; last as last">
+              {{def.desc}}<span *ngIf="!last"> - </span>
+            </span>
+          </a>
+
+        </ng-template>
+
+      </li>
+
+    </ol><ng-template #elseBlock>
+
+      <span *ngFor="let def of d.lines[0]; last as last">
+        <a (click) = "toggleDefinition(def)"
+        [ngClass]="{'definition': true, 'unused': def.unused}">{{def.desc}}</a>
+        <span *ngIf="!last"> - </span>
+      </span>
+
+    </ng-template>
+
+  </div>
 </div>

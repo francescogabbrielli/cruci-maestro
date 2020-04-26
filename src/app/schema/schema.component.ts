@@ -38,6 +38,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
 
   model: SchemaModel
   state: SchemaState
+
+  @Input()
   selection: Highlight
 
   sel:string
@@ -61,8 +63,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnInit() {
     //console.log("ON INIT")
-    $(document).mousemove(event=>this.resize(event))
-    $(document).mouseup(event=>this.prepareDrag(undefined, undefined, false, event))
+    $(document).mousemove(event => this.resize(event))
+    $(document).mouseup(event => this.prepareDrag(undefined, undefined, false, event))
   }
 
   init() {

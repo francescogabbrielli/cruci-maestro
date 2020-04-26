@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core'
+import { Component, OnInit, OnDestroy, EventEmitter, Input, Output } from '@angular/core'
 import { Subscription } from 'rxjs/Subscription'
 
 import { AuthService } from '../auth.service'
@@ -9,17 +9,22 @@ class DefinitionBlock {
   title: string
   lines: Definition[][]
   horizontal:boolean
-  constructor(horizontal:boolean, size:number) {
+  random:boolean
+  constructor(horizontal:boolean, size:number, random:boolean) {
     this.title = horizontal ? "Horizontals" : "Verticals"
     this.lines = Array(size)
     this.horizontal = horizontal
+    this.random = random
   }
   add(def:Definition):void {
     let dim = this.horizontal ? 0 : 1
     let high = def.highlight
-    let line = this.lines[high.start[1-dim]]
+    let index = this.random ? 0 : high.start[1-dim]
+    let line = this.lines[index]
     if (!line) {
       line = [def]
+    } else if (this.random) {
+      line.splice(Math.floor(Math.random() * Math.floor(line.length)), 0, def)
     } else {
       for (var i=0; i<line.length; i++) {
         let h = line[i].highlight
@@ -31,7 +36,7 @@ class DefinitionBlock {
       if (i===line.length)
         line.push(def)
     }
-    this.lines[high.start[1-dim]] = line
+    this.lines[index] = line
   }
 }
 
@@ -48,6 +53,15 @@ export class DefinitionListComponent implements OnInit {
   private subscription:Subscription
 
   defs:Array<DefinitionBlock>
+
+  @Input()
+  random:boolean
+
+  @Output()
+  selected:EventEmitter<Highlight> = new EventEmitter<Highlight>()
+
+
+  show:number = 0
 
   visible:boolean = false
   single:boolean = false
@@ -70,20 +84,30 @@ export class DefinitionListComponent implements OnInit {
   init() {
     let size = this.schema.getSize()
     this.defs = [
-      new DefinitionBlock(true, size.rows),
-      new DefinitionBlock(false, size.cols)
+      new DefinitionBlock(true, size.rows, this.random),
+      new DefinitionBlock(false, size.cols, this.random)
     ]
     for (let def of this.schema.defsGenerator()) {
       let block = this.defs[def.highlight.isHorizontal() ? 0 : 1]
       block.add(def)
     }
-    this.visible = this.auth.getUserConfig().authorMode || !this.schema.isType(SchemaType.Obliged)
+    this.visible = this.random || this.auth.getUserConfig().authorMode || !this.schema.isType(SchemaType.Obliged)
     this.single = !this.schema.isType(SchemaType.Fixed)
     this.size = this.schema.getSize()
   }
 
+  toggleBlock() {
+    if (++this.show === this.defs.length)
+      this.show = 0
+  }
+
+  toggleDefinition(d:Definition) {
+    d.unused = !d.unused
+  }
+
   setSelection(h:Highlight) {
     this.schema.setSelection(h)
+    this.selected.emit(h)
   }
 
   setLineSelection(line:Definition[]) {

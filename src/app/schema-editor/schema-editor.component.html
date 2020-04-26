@@ -1,6 +1,11 @@
-<schema [config]="userConfig"
-  (stateChanged)="onStateChanged($event)" (selected)="onSelected($event)">
-</schema>
-<defs [config]="userConfig" *ngIf="type!=='obliged'"
+<div class="schema-container">
+  <schema [config]="userConfig" [selection]="selection"
+    (stateChanged)="onStateChanged($event)" (selected)="onSelected($event)">
+  </schema>
+  <definition-list [random]="true" *ngIf="!userConfig.authorMode && type==='obliged'"
+    (selected)="onDefinitionSelection($event)">
+  </definition-list>
+</div>
+<defs [config]="userConfig" *ngIf="userConfig.authorMode || type!=='obliged'"
   [state]="state" [type]="type" [selection]="selection" [tabindex]="tabindex.defs">
 </defs>

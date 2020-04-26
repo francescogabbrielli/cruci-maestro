@@ -38,6 +38,10 @@ export class SchemaEditorComponent implements OnInit, OnDestroy {
     this.selection = h
   }
 
+  onDefinitionSelection(h:Highlight) {
+    this.selection = h
+  }
+
   constructor(auth:AuthService, schema: SchemaService) {
     this.auth = auth
     this.schema = schema

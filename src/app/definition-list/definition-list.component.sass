@@ -2,9 +2,20 @@
 @import '../theme.sass'
 
 .definition-block
-  display: inline-block
-  width: 50%
   vertical-align: top
+  padding: 10px
+
+h3
+  margin: 0px
+  padding-top: 10px
+  padding-left: 10px
+
+ol
+  margin: 0px
+
+.over.hidden
+  position: absolute
+  display: none
 
 .definition, .definition:active, .definition:link
   text-decoration: none
@@ -12,6 +23,11 @@
 
 .definition:hover
   text-decoration: underline
+  cursor: pointer
 
 .definition.unused
-  color: map-get($warn, 400)
+  color: map-get($warn, 200)
+
+div.over .definition.unused
+  //color: gray
+  text-decoration: line-through
