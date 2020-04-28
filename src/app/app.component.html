@@ -38,6 +38,7 @@
         <mat-icon aria-hidden="false" aria-label="home icon">person</mat-icon>
         <span class="user" *ngIf="auth.isLogged()">{{auth.getUser().username}}</span>
       </a>
+      <a class="button button-enabled" title="Legenda" (click)="help()"><mat-icon aria-hidden="false" aria-label="home icon">help</mat-icon></a>
     </mat-toolbar>
     <div class="container">
       <router-outlet></router-outlet>

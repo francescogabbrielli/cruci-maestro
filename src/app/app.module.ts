@@ -2,12 +2,13 @@ import { BrowserModule } from '@angular/platform-browser'
 import { NgModule } from '@angular/core'
 
 import { AppRoutingModule } from './app-routing.module'
-import { AppComponent } from './app.component'
+import { AppComponent, HelpComponent } from './app.component'
 import { SchemaComponent } from './schema/schema.component'
 import { DefsComponent } from './defs/defs.component'
 import { DefinitionListComponent } from './definition-list/definition-list.component'
 import { SettingsComponent } from './settings/settings.component'
 import { LoginComponent } from './login/login.component'
+import { SchemaEditorComponent } from './schema-editor/schema-editor.component'
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { DragDropModule } from '@angular/cdk/drag-drop'
@@ -22,12 +23,14 @@ import { MatListModule } from '@angular/material/list'
 import { MatInputModule } from '@angular/material/input'
 import { MatSelectModule } from '@angular/material/select'
 import { MatRadioModule } from '@angular/material/radio'
-import {MatSnackBarModule} from '@angular/material/snack-bar';
-import { SchemaEditorComponent } from './schema-editor/schema-editor.component'
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+
 
 @NgModule({
   declarations: [
     AppComponent,
+    HelpComponent,
     SchemaComponent,
     DefsComponent,
     DefinitionListComponent,
@@ -51,7 +54,8 @@ import { SchemaEditorComponent } from './schema-editor/schema-editor.component'
     MatInputModule,
     MatSelectModule,
     MatRadioModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatBottomSheetModule
   ],
   bootstrap: [AppComponent]
 })

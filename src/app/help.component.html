@@ -1,0 +1,16 @@
+
+<table class="legend">
+  <tr>
+    <th>Spazio</th><td>Cancella e vai avanti</td>
+  </tr><tr>
+    <th>Del/Canc</th><td>Cancella senza muoversi</td>
+  </tr><tr>
+    <th>Backspace</th><td>Cancella andando indietro</td>
+  </tr><tr>
+    <th>Invio/Doppio clic</th><td>Inverte direzione</td>
+  </tr><tr *ngIf="isAuthor() || !isFixed()">
+    <th>.</th><td>Inserisce una casella nera</td>
+  </tr><tr *ngIf="isAuthor()">
+    <th>+/-</th><td>Blocca/Sblocca una casella</td>
+  </tr>
+</table>

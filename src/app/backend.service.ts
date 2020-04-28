@@ -31,9 +31,10 @@ export class BackendService {
   }
 
   async logout():Promise<any> {
-     this.client.auth.logout()
-     this.initPromise = this.client.auth.loginWithCredential(new AnonymousCredential())
-     return this.initPromise
+     this.client.auth.logout().finally(() => {
+       this.initPromise = this.client.auth.loginWithCredential(new AnonymousCredential())
+       return this.initPromise
+     })
   }
 
   async login(user:string, password:string):Promise<any> {

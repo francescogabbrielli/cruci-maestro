@@ -47,9 +47,10 @@ export class SchemaService {
       // console.log("USER CHANGED", user, this.auth.getUser() )
       let triggerLoad = this.authorMode === undefined || (!this.authorMode && user?.config.authorMode)
       //console.log("AUTHOR old =",this.authorMode, "; new =", user.config.authorMode)
-      if (this.authorMode && !user.config.authorMode)
-        this.clear()
+      let triggerClear = this.authorMode && !user.config.authorMode
       this.authorMode = user?.config.authorMode
+      if (triggerClear)
+        this.clear()
       if (triggerLoad)
         this.load()
     })
@@ -276,7 +277,10 @@ export class SchemaService {
   }
 
   check():Promise<any> {
-    return this.be.check(this.model)
+    return this.be.check(this.model).then(res => {
+      console.log(res)
+      return res
+    })
   }
 
   isAuthor():boolean {
