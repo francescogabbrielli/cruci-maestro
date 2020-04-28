@@ -11,7 +11,7 @@ class DefinitionBlock {
   horizontal:boolean
   random:boolean
   constructor(horizontal:boolean, size:number, random:boolean) {
-    this.title = horizontal ? "Horizontals" : "Verticals"
+    this.title = horizontal ? "Orizzontali" : "Verticali"
     this.lines = Array(size)
     this.horizontal = horizontal
     this.random = random

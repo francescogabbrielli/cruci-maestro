@@ -28,8 +28,6 @@ export class SchemaEditorComponent implements OnInit, OnDestroy {
 
   userConfig:Config
 
-  type:SchemaType
-
   onStateChanged(s:SchemaState) {
     this.state = s
   }
@@ -45,24 +43,26 @@ export class SchemaEditorComponent implements OnInit, OnDestroy {
   constructor(auth:AuthService, schema: SchemaService) {
     this.auth = auth
     this.schema = schema
-    this.selection = schema.getSelection()
-    console.log(this.selection)
+    this.selection = this.schema.noSelection
     this.userConfig = auth.getUserConfig()
-    this.type = schema.model.type
   }
 
   ngOnInit(): void {
     this.schemaSubscription = this.schema.subscribe(loading => {
+      console.log("SCHEMA CHANGE", loading)
       if (loading)
         return
       this.userConfig = {...this.auth.getUserConfig()}
-      this.type = this.schema.model.type
-      console.log("SCHEMA CHANGE", this.userConfig)
+      this.selection = this.schema.noSelection
     });
   }
 
   ngOnDestroy():void {
     this.schemaSubscription.unsubscribe();
+  }
+
+  isOwner():boolean {
+    return this.schema.model.owner === this.auth.getUser()?.id
   }
 
 }

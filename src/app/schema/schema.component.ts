@@ -36,13 +36,14 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   private dragPosition:{x:number, y:number}
   private dragging:boolean = false
 
-  model: SchemaModel
-  state: SchemaState
+  model:SchemaModel
+  state:SchemaState
 
   @Input()
-  selection: Highlight
+  selection:Highlight
 
-  sel:string
+  @Input()
+  type:SchemaType
 
   @Input()
   config:Config
@@ -58,7 +59,7 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     this.service = service
     this.cells = this.service.create2DArray(999,999)
     this.state = {x:0, y:0, horizontal:true, focused:false}
-    this.selection = this.service.getSelection()
+    this.selection = this.service.noSelection
   }
 
   ngOnInit() {
@@ -84,7 +85,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes:SimpleChanges) {
-    //console.log("CHANGES", changes, this.service.loading)
+    if (!this.service.isAuthor() && changes.type !== undefined && this.model !== undefined)
+      this.service.clear()
     this.init()
   }
 
@@ -178,8 +180,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   highlightCurrentWord() {
     let start=0, end=this.state.horizontal ? this.size.cols-1 : this.size.rows-1
     if (this.config.authorMode || this.service.isType(SchemaType.Fixed)) {
-      start = undefined
-      end = undefined
+      start = this.state.horizontal ? this.state.x : this.state.y
+      end = this.state.horizontal ? this.state.x : this.state.y
       let incX = this.state.horizontal ? 1 : 0
       let incY = this.state.horizontal ? 0 : 1
       for (let x=this.state.x, y=this.state.y; x>=0 && y>=0; x-=incX, y-=incY)
@@ -219,6 +221,10 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
 
   getCell() {
     return this.cells[this.state.y][this.state.x]
+  }
+
+  isLocked(i:number, j:number) {
+    return this.service.isCellLocked(i, j)
   }
 
   setCell(value) {
@@ -279,6 +285,10 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     //force insert char and stay
     } else if (this.input.match(/^[A-Z]$/)) {
       this.setCell(this.input)
+    } else if (this.input==='+') {
+      this.service.setHint(this.state.y, this.state.x, true)
+    } else if (this.input==='-') {
+      this.service.setHint(this.state.y, this.state.x, false)
     }
     //console.log("INPUT: ", $event)
   }

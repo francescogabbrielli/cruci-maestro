@@ -56,6 +56,7 @@ export enum SchemaType {
 
 export interface SchemaModel {
   id?:string
+  owner?:string
   title:string
   type:SchemaType
   size:[number, number]

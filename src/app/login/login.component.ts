@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit {
     this.router = router
     // redirect to home if already logged in
     if (this.auth.isLogged()) {
-      this.router.navigate(['/'])
+      this.auth.logout()
     }
   }
 

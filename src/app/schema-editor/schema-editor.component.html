@@ -1,11 +1,39 @@
+
+<div *ngIf="userConfig.authorMode || isOwner()" class="info-container">
+
+  <form name="schemaForm" class="settings-form" #schemaForm="ngForm">
+    <mat-form-field *ngIf="userConfig.authorMode">
+      <mat-label>
+        <span>
+          Titolo
+        </span>
+      </mat-label>
+      <input matInput name="title" [(ngModel)]="schema.model.title" aria-label="Insert title">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>
+        <span>
+          Tipo di soluzione
+        </span>
+      </mat-label>
+      <mat-select name="type" [(ngModel)]="schema.model.type" aria-label="Select an option">
+        <mat-option value="fixed">Schema Fisso</mat-option>
+        <mat-option value="free">Schema Libero</mat-option>
+        <mat-option value="obliged">Incroci Obbligati</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</div>
+
 <div class="schema-container">
-  <schema [config]="userConfig" [selection]="selection"
+
+  <schema [config]="userConfig" [type]="schema.model.type"
     (stateChanged)="onStateChanged($event)" (selected)="onSelected($event)">
   </schema>
-  <definition-list [random]="true" *ngIf="!userConfig.authorMode && type==='obliged'"
+  <definition-list [random]="true" *ngIf="!userConfig.authorMode && schema.model.type==='obliged'"
     (selected)="onDefinitionSelection($event)">
   </definition-list>
 </div>
-<defs [config]="userConfig" *ngIf="userConfig.authorMode || type!=='obliged'"
-  [state]="state" [type]="type" [selection]="selection" [tabindex]="tabindex.defs">
+<defs [config]="userConfig" *ngIf="userConfig.authorMode || schema.model.type!=='obliged'"
+  [state]="state" [type]="schema.model.type" [selection]="selection" [tabindex]="tabindex.defs">
 </defs>

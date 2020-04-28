@@ -3,7 +3,7 @@
       [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
       [opened]="(isHandset$ | async) === false">
-    <mat-toolbar>Menu</mat-toolbar>
+    <mat-toolbar>{{title}}</mat-toolbar>
     <mat-nav-list>
       <a mat-list-item (click)="drawer.mode==='over' && drawer.close()"
         routerLink="/schema" routerLinkActive="selected-route">
@@ -12,11 +12,11 @@
       <a *ngIf="auth.getUserConfig().authorMode || !schema.isType(obliged)"
         mat-list-item (click)="drawer.mode==='over' && drawer.close()"
         routerLink="/definitions" routerLinkActive="selected-route">
-        <mat-icon aria-hidden="false" aria-label="Example home icon">list</mat-icon>&nbsp;Definitions
+        <mat-icon aria-hidden="false" aria-label="Example home icon">list</mat-icon>&nbsp;Definizioni
       </a>
       <a mat-list-item (click)="drawer.mode==='over' && drawer.close()"
         routerLink="/settings" routerLinkActive="selected-route">
-        <mat-icon aria-hidden="false" aria-label="Example home icon">settings</mat-icon>&nbsp;Settings
+        <mat-icon aria-hidden="false" aria-label="Example home icon">settings</mat-icon>&nbsp;Impostazioni
       </a>
     </mat-nav-list>
   </mat-sidenav>
@@ -30,19 +30,17 @@
         *ngIf="isHandset$ | async">
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
-      <span>{{title}}</span>
+      <span>{{schema.model.title}}</span>
       <span class="toolbar-spacer"></span>
-      <a class="button button-enabled" (click)="save()"><mat-icon aria-hidden="false" aria-label="home icon">save</mat-icon></a>
-      <a class="button button-enabled" routerLink="/login" >
-        <span class="user" *ngIf="auth.isLogged()">{{auth.getUser().username}}</span>
+      <a class="button button-enabled" title="Salva" [ngClass]="{'button-active': schema.isModified()}" *ngIf="auth.getUserConfig().authorMode" (click)="schema.save()"><mat-icon aria-hidden="false" aria-label="home icon">save</mat-icon></a>
+      <a class="button button-enabled" title="Controlla la soluzione" *ngIf="!auth.getUserConfig().authorMode" (click)="check()"><mat-icon aria-hidden="false" aria-label="home icon">check</mat-icon></a>
+      <a class="button button-enabled" [title]="auth.isLogged() ? 'Logout' : 'Login'" routerLink="/login" >
         <mat-icon aria-hidden="false" aria-label="home icon">person</mat-icon>
+        <span class="user" *ngIf="auth.isLogged()">{{auth.getUser().username}}</span>
       </a>
     </mat-toolbar>
-    <mat-card>
-      <mat-card-title>{{schema.model.title}}</mat-card-title>
-      <mat-card-content>
-        <router-outlet></router-outlet>
-      </mat-card-content>
-    </mat-card>
+    <div class="container">
+      <router-outlet></router-outlet>
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

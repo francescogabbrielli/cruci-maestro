@@ -1,4 +1,4 @@
-<div>
+<div class="wrapper">
   <input class="input" size="1" maxlength="1" type="text" maxlength="1" tabindex="1" [(ngModel)]="input"
     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
     (focus)="onInputFocus($event)" (blur)="onInputBlur()" (input)="onInput($event)" (keydown)="onKeyDown($event)">
@@ -7,7 +7,7 @@
       <td *ngFor="let cell of row; index as j; last as lastColumn"
         (mousedown)="prepareDrag(i, j, lastRow && lastColumn, $event)"
         (dblclick)="toggleOrientation()">
-        <div *ngIf="cell==='.'" class="block"
+        <div *ngIf="cell==='.'" class="block" [ngClass]="{'locked': isLocked(i,j) && (model.type!='fixed' || config.authorMode)}"
           [style.width]="cellSize+'px'" [style.height]="cellSize+'px'">
         </div>
         <div *ngIf="j==state.x && i==state.y" class="cursor"
@@ -24,7 +24,8 @@
               'word-sv': !state.horizontal && selection.startsWith(j,i),
               'word-v': !state.horizontal && selection.contains(j,i),
               'word-ev': !state.horizontal && selection.endsWith(j,i),
-              'focused': state.focused
+              'focused': state.focused,
+              'locked': isLocked(i,j)
               }">
           {{cell!=='.'?cell:''}}
         </div>

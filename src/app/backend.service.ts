@@ -76,11 +76,13 @@ export class BackendService {
     return this.db.collection('schemas').find({}, options).first().then(doc => {
       let model:SchemaModel = {
         id: doc._id.toString(),
+        owner: doc.owner_id.toString(),
         title: doc.title,
         type: doc.type,
         size: [doc.rows, doc.cols],
         definitions: doc.definitions,
-        blocks: doc.blocks
+        blocks: doc.blocks,
+        hints: doc.hints,
       }
       if (doc.cells !== undefined)
         model.cells = JSON.parse(atob(doc.cells))
@@ -88,7 +90,7 @@ export class BackendService {
     })
   }
 
-  async saveSchema(model:SchemaModel) {
+  async saveSchema(model:SchemaModel):Promise<any> {
     await this.initPromise
     let id = model.id
     let m = {...model, ...{
@@ -109,6 +111,16 @@ export class BackendService {
     return this.db.collection('schemas').updateOne(
       {_id: new ObjectId(id)}, {$set: m}
     )
+  }
+
+  async check(model:SchemaModel):Promise<any> {
+    let m = {
+      id: model.id,
+      rows: model.size[0],
+      cols: model.size[1],
+      cells: btoa(JSON.stringify(model.cells))
+    }
+    return this.client.callFunction("check", [m])
   }
 
 }

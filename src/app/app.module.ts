@@ -22,6 +22,7 @@ import { MatListModule } from '@angular/material/list'
 import { MatInputModule } from '@angular/material/input'
 import { MatSelectModule } from '@angular/material/select'
 import { MatRadioModule } from '@angular/material/radio'
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { SchemaEditorComponent } from './schema-editor/schema-editor.component'
 
 @NgModule({
@@ -49,7 +50,8 @@ import { SchemaEditorComponent } from './schema-editor/schema-editor.component'
     MatListModule,
     MatInputModule,
     MatSelectModule,
-    MatRadioModule
+    MatRadioModule,
+    MatSnackBarModule
   ],
   bootstrap: [AppComponent]
 })

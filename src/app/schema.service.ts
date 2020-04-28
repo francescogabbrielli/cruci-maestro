@@ -20,11 +20,14 @@ export class SchemaService {
 
   private defs:{[index:string]:Definition} = {}
   private locked:{[index:string]:boolean} = {}
+  private authorMode:boolean
 
   private loading:BehaviorSubject<boolean>
 
   readonly noSelection:Highlight = new Highlight(-1,-1,-1,-1)
   private selection:Highlight = this.noSelection
+
+  private modified:boolean = false
 
   constructor(auth:AuthService, be:BackendService) {
     this.auth = auth
@@ -41,8 +44,14 @@ export class SchemaService {
 
     this.loading = new BehaviorSubject<boolean>(false)
     this.auth.subscribe(user => {
-      console.log("USER CHANGED", user )
-      this.load()
+      // console.log("USER CHANGED", user, this.auth.getUser() )
+      let triggerLoad = this.authorMode === undefined || (!this.authorMode && user?.config.authorMode)
+      //console.log("AUTHOR old =",this.authorMode, "; new =", user.config.authorMode)
+      if (this.authorMode && !user.config.authorMode)
+        this.clear()
+      this.authorMode = user?.config.authorMode
+      if (triggerLoad)
+        this.load()
     })
     //this.updated.subscribe((v) => console.log("UPDATED", v))
   }
@@ -70,6 +79,7 @@ export class SchemaService {
   setCells(cells:string[][]):void {
     this.model.cells = cells
     this.model.size = [cells.length, cells[0].length]
+    this.modified = true
   }
 
   populate(cells:string[][]):void {
@@ -92,6 +102,7 @@ export class SchemaService {
   setCell(...params:any[]):void
   setCell(i:number, j:number, value:string):void {
     this.model.cells[i][j] = value
+    this.modified = true
   }
 
   /** Determines if a cell is "locked" to show up in the solution mode */
@@ -100,13 +111,15 @@ export class SchemaService {
   }
 
   setHint(i:number, j:number, set:boolean):void {
+    if (this.getCell(i,j)===' ' || !this.authorMode)
+      return
     let k:string = i+"-"+j
     this.locked[k] = set
     let found = -1
     if (!(this.model.hints instanceof Array))
       this.model.hints = []
     for (let index=0; found<0 && index<this.model.hints.length; index++)
-      if (k === this.model.hints[0]+"-"+this.model.hints[1])
+      if (k === this.model.hints[index][0]+"-"+this.model.hints[index][1])
         found = index
     if (!set && found>=0)
       this.model.hints.splice(found, 1)
@@ -140,7 +153,7 @@ export class SchemaService {
    */
   getDefs(selection?:Highlight):Definition[] {
     selection = selection || this.selection
-    return this.auth.getUserConfig().authorMode || this.isType(SchemaType.Fixed)
+    return this.authorMode || this.isType(SchemaType.Fixed)
       ? [this.defs[selection.toString()] || new Definition(selection)]
       : this.model.definitions.filter(def => selection.containsAll(def.highlight))
   }
@@ -172,29 +185,42 @@ export class SchemaService {
       }
   }
 
-  isLoading() {
-    return this.loading.value
+  clear():void {
+    this.selection = this.noSelection
+    this.setCells(this.create2DArray(...this.model.size))
+
+    // locked cells
+    this.locked = {}
+    let array = this.model.hints instanceof Array ? this.model.hints : []
+    if (!this.authorMode && this.model.type===SchemaType.Fixed && this.model.blocks instanceof Array)
+      array = array.concat(this.model.blocks)
+    for (let cell of array) {
+      this.locked[cell[0]+"-"+cell[1]] = true
+      this.setCell(...cell)
+    }
+
+    this.loading.next(false)
   }
 
-  load() {
+  load():Promise<any> {
 
     this.loading.next(true)
-    //console.log("LOADING", this.auth.getUserConfig().authorMode)
+    //console.log("LOADING", this.authorMode)
 
-    this.be.loadSchema(this.auth.getUserConfig().authorMode).then((model) => {
+    return this.be.loadSchema(this.authorMode).then((model) => {
 
-      //this.selection = this.noSelection
+      this.selection = this.noSelection
       this.model = model
 
       //cells
-      this.setCells(this.auth.getUserConfig().authorMode
+      this.setCells(this.authorMode
         ? model.cells
         : this.create2DArray(...model.size))
 
       // locked cells
       this.locked = {}
       let array = this.model.hints instanceof Array ? this.model.hints : []
-      if (!this.auth.getUserConfig().authorMode && this.model.type===SchemaType.Fixed && this.model.blocks instanceof Array)
+      if (!this.authorMode && this.model.type===SchemaType.Fixed && this.model.blocks instanceof Array)
         array = array.concat(this.model.blocks)
       for (let cell of array) {
         this.locked[cell[0]+"-"+cell[1]] = true
@@ -212,14 +238,16 @@ export class SchemaService {
       }
 
     })
-    .catch(err => console.error(err))
-    .finally(() => this.loading.next(false))
+    .catch(err => alert("Server error:" + err))
+    .finally(() => {
+      this.loading.next(false)
+      this.modified = false
+    })
 
   }
 
-  save() {
-    if (this.auth.getUserConfig().authorMode) {
-      this.model.type = this.auth.getUserConfig().solutionType//TODO: just use schema model
+  save():Promise<any> {
+    if (this.authorMode) {
       let defs = []
       let unused = false
       for (let def of this.defsGenerator(true)) {
@@ -229,13 +257,14 @@ export class SchemaService {
           unused = true
       }
       this.model.definitions = defs
-      this.be.saveSchema(this.model).then(
+      return this.be.saveSchema(this.model).then(
           res => console.log(res),
           err => console.log(err)
-        )
+        ).finally(() => this.modified = false)
       if (unused)
         alert("Attenzione! ci sono definizioni non utilizzate. Non verrano salvate")
     }
+    return new Promise(null)
     // client.auth.loginWithCredential(new UserPasswordCredential("demo@francescogabbrielli.it", "demo20"))
     // .then((login) => {
     //   return db.collection('tests').updateOne({title: "test4"}, {$set: {owner_id: 'd', test: true}}, {upsert: true})
@@ -245,4 +274,21 @@ export class SchemaService {
     //   console.error(err)
     // })
   }
+
+  check():Promise<any> {
+    return this.be.check(this.model)
+  }
+
+  isAuthor():boolean {
+    return this.auth && this.auth.getUserConfig().authorMode
+  }
+
+  isLoading():boolean {
+    return this.loading.value
+  }
+
+  isModified():boolean {
+    return this.modified
+  }
+
 }

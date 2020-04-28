@@ -6,7 +6,7 @@
     <mat-form-field class="def-input">
       <mat-label>
         <span *ngIf="selection.length()>1 && state !== undefined">
-          {{selection.length()}} letters - {{state.horizontal ? "Horizontal" : "Vertical"}}
+          {{state.horizontal ? "Orizzontale" : "Verticale"}} - {{selection.length()}} lettere
         </span>
       </mat-label>
       <input [tabindex]="tabindex" name="def" matInput placeholder="...definition..."
@@ -23,7 +23,7 @@
 </div><ng-template #elseBlock>
 
   <span class="label" *ngIf="selection.length()>1 && state !== undefined">
-      {{selection.length()}} letters - {{state.horizontal ? "Horizontal" : "Vertical"}}
+      {{state.horizontal ? "Orizzontale" : "Verticale"}} - {{selection.length()}} lettere
   </span>
   <p class="definition"><span *ngFor="let def of defs; last as last">{{def.desc}}<span *ngIf="!last"> - </span></span></p>
 

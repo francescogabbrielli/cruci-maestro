@@ -7,6 +7,10 @@ $cell-size: 28px
 $cell-radius: 5px
 
 
+.wrapper
+  margin: 0px
+  padding: 0px
+
 table
   border-spacing: 0
   border-collapse: collapse
@@ -97,3 +101,11 @@ table td
   border-bottom-left-radius: $cell-radius
   border-bottom-right-radius: $cell-radius
   border-bottom-width: 2px
+
+.block.locked
+  background-color: map-get($accent, 800) !important
+
+.cell.locked
+  color: map-get($accent, 800) !important
+  font-weight: 900 !important
+  font-size: $cell-size/2 + 2
