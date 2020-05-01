@@ -1,16 +1,27 @@
-
+<h3>Tastiera / Mouse / Touch</h3>
 <table class="legend">
+  <tr *ngIf="isAuthor() || !isFixed()">
+    <th>.</th><td>Inserisce una casella nera</td>
+  </tr>
+  <tr>
+    <th>Frecce/PgUp/PgDown/Home/End</th><td>Muovi il cursore</td>
+  </tr>
   <tr>
     <th>Spazio</th><td>Cancella e vai avanti</td>
-  </tr><tr>
+  </tr>
+  <tr>
     <th>Del/Canc</th><td>Cancella senza muoversi</td>
-  </tr><tr>
+  </tr>
+  <tr>
     <th>Backspace</th><td>Cancella andando indietro</td>
-  </tr><tr>
+  </tr>
+  <tr>
     <th>Invio/Doppio clic</th><td>Inverte direzione</td>
-  </tr><tr *ngIf="isAuthor() || !isFixed()">
-    <th>.</th><td>Inserisce una casella nera</td>
-  </tr><tr *ngIf="isAuthor()">
+  </tr>
+  <tr *ngIf="isAuthor()">
+    <th>Trascina ultima casella</th><td>Modifica le dimensioni dello schema</td>
+  </tr>
+  <tr *ngIf="isAuthor()">
     <th>+/-</th><td>Blocca/Sblocca una casella</td>
   </tr>
 </table>

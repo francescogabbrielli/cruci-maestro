@@ -177,25 +177,57 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
         : new Highlight(this.state.x, start, this.state.x, end)
     }
 
-  highlightCurrentWord() {
+  getNextPosition(direction:number):number[] {
+    let initial = direction > 0
+      ? [this.selection.end[0], this.selection.end[1]]
+      : [this.selection.start[0], this.selection.start[1]]
+    let index = this.state.horizontal ? 0 : 1
+    let size = [this.size.cols, this.size.rows]
+    let found = undefined
+    let pos = initial
+    do {
+      pos[index] += direction
+      if (pos[index] < 0 || pos[index] >= size[index]) {
+        pos[index] = direction<0 ? size[index]-1 : 0
+        pos[1-index] += direction
+        found = undefined
+      }
+      if (pos[1-index]<0 || pos[1-index] >= size[1-index])
+        break
+      if (found!==undefined) {
+        if (this.cells[pos[1]][pos[0]] === '.')
+          found = undefined
+        else
+          break
+      } else if (this.cells[pos[1]][pos[0]] !== '.')
+        found = [pos[0], pos[1]]
+    } while (true)
+    return found || initial
+  }
+
+  highlightCurrentWord():void {
+    let highlight = this.highlightWord(this.state.x, this.state.y)
+    if (!this.selection.equals(highlight))
+      this.setSelection(highlight)
+  }
+
+  highlightWord(x0: number, y0: number):Highlight {
     let start=0, end=this.state.horizontal ? this.size.cols-1 : this.size.rows-1
     if (this.config.authorMode || this.service.isType(SchemaType.Fixed)) {
-      start = this.state.horizontal ? this.state.x : this.state.y
-      end = this.state.horizontal ? this.state.x : this.state.y
+      start = this.state.horizontal ? x0 : y0
+      end = this.state.horizontal ? x0 : y0
       let incX = this.state.horizontal ? 1 : 0
       let incY = this.state.horizontal ? 0 : 1
-      for (let x=this.state.x, y=this.state.y; x>=0 && y>=0; x-=incX, y-=incY)
+      for (let x=x0, y=y0; x>=0 && y>=0; x-=incX, y-=incY)
         if (this.cells[y][x]!=='.')
           start = this.state.horizontal ? x : y
         else break
-      for (let x=this.state.x, y=this.state.y; x<this.size.cols && y<this.size.rows; x+=incX, y+=incY)
+      for (let x=x0, y=y0; x<this.size.cols && y<this.size.rows; x+=incX, y+=incY)
         if (this.cells[y][x]!=='.')
           end = this.state.horizontal ? x : y
         else break
     }
-    let highlight = this.getCurrentHighlight(start, end)
-    if (!this.selection.equals(highlight))
-      this.setSelection(highlight)
+    return this.getCurrentHighlight(start, end)
   }
 
   moveCursor(x:number, y?:number) {
@@ -303,29 +335,35 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   keyDown(event: KeyboardEvent) {
     if (!this.state.focused)
       return true
-    //console.log(event.key)
-    if (event.key === "ArrowRight") {
+    // console.log(event.key)
+    if (event.key === "ArrowRight" || event.key === "Right") {
       this.moveCursor(this.state.x+1, this.state.y)
       //this.toggleOrientation(true)
       return false
-    } else if (event.key === "ArrowLeft") {
+    } else if (event.key === "ArrowLeft" || event.key === "Left") {
       this.moveCursor(this.state.x-1, this.state.y)
       //this.toggleOrientation(true)
       return false
-    } else if (event.key === "ArrowDown") {
+    } else if (event.key === "ArrowDown" || event.key === "Down") {
       this.moveCursor(this.state.x, this.state.y+1)
       //this.toggleOrientation(false)
       return false
-    } else if (event.key === "ArrowUp") {
+    } else if (event.key === "ArrowUp" || event.key === "Up") {
       this.moveCursor(this.state.x, this.state.y-1)
       //this.toggleOrientation(false)
       return false
     } else if (event.key === "Enter") {
       this.toggleOrientation()
     } else if (event.key === "Home") {
-      this.moveCursor(0, 0)
+      this.moveCursor(this.selection.start[0], this.selection.start[1])
     } else if (event.key === "End") {
-      this.moveCursor(this.size.cols-1, this.size.rows-1)
+      this.moveCursor(this.selection.end[0], this.selection.end[1])
+    } else if (event.key === "PageUp") {
+      let p = this.getNextPosition(-1)
+      this.moveCursor(p[0], p[1])
+    } else if (event.key === "PageDown") {
+      let p = this.getNextPosition(1)
+      this.moveCursor(p[0], p[1])
     //delete char and move backward
     } else if (event.keyCode==8 || event.key === "Backspace") {
       this.moveCursor(-1)

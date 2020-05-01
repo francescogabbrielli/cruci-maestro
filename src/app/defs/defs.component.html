@@ -22,9 +22,9 @@
 
 </div><ng-template #elseBlock>
 
-  <span class="label" *ngIf="selection.length()>1 && state !== undefined">
-      {{state.horizontal ? "Orizzontale" : "Verticale"}} - {{selection.length()}} lettere
+  <span class="label">
+      &nbsp;<span *ngIf="selection.length()>1 && state !== undefined">{{state.horizontal ? "Orizzontale" : "Verticale"}} - {{selection.length()}} lettere</span>
   </span>
-  <p class="definition"><span *ngFor="let def of defs; last as last">{{def.desc}}<span *ngIf="!last"> - </span></span></p>
+  <p class="definition"><span *ngFor="let def of defs; last as last">{{def.desc}}<span *ngIf="!last"> - </span></span>&nbsp;</p>
 
 </ng-template>

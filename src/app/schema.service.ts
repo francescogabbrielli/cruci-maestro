@@ -258,12 +258,12 @@ export class SchemaService {
           unused = true
       }
       this.model.definitions = defs
+      if (unused)
+        alert("Attenzione! ci sono definizioni non utilizzate. Non verrano salvate")
       return this.be.saveSchema(this.model).then(
           res => console.log(res),
           err => console.log(err)
         ).finally(() => this.modified = false)
-      if (unused)
-        alert("Attenzione! ci sono definizioni non utilizzate. Non verrano salvate")
     }
     return new Promise(null)
     // client.auth.loginWithCredential(new UserPasswordCredential("demo@francescogabbrielli.it", "demo20"))

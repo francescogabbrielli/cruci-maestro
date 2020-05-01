@@ -25,8 +25,11 @@
   </form>
 </div>
 
-<div class="schema-container">
+<defs [config]="userConfig" *ngIf="userConfig.authorMode || schema.model.type!=='obliged'"
+  [state]="state" [type]="schema.model.type" [selection]="selection" [tabindex]="tabindex.defs">
+</defs>
 
+<div class="schema-container">
   <schema [config]="userConfig" [type]="schema.model.type"
     (stateChanged)="onStateChanged($event)" (selected)="onSelected($event)">
   </schema>
@@ -34,6 +37,3 @@
     (selected)="onDefinitionSelection($event)">
   </definition-list>
 </div>
-<defs [config]="userConfig" *ngIf="userConfig.authorMode || schema.model.type!=='obliged'"
-  [state]="state" [type]="schema.model.type" [selection]="selection" [tabindex]="tabindex.defs">
-</defs>

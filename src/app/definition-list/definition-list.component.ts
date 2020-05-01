@@ -92,7 +92,7 @@ export class DefinitionListComponent implements OnInit {
       block.add(def)
     }
     this.visible = this.random || this.auth.getUserConfig().authorMode || !this.schema.isType(SchemaType.Obliged)
-    this.single = !this.schema.isType(SchemaType.Fixed)
+    this.single = !this.auth.getUserConfig().authorMode && !this.schema.isType(SchemaType.Fixed)
     this.size = this.schema.getSize()
   }
 
