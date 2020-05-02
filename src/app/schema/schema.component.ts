@@ -6,6 +6,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop'
 import {Subscription} from 'rxjs/Subscription'
 import $ from "jquery"
 
+import { Utils } from '../utils'
+
 import { Config } from '../auth.service'
 import { SchemaService } from '../schema.service'
 import { SchemaModel, SchemaType, Highlight } from '../schema.model'
@@ -17,8 +19,6 @@ import { SchemaState } from './state'
   styleUrls: ['./schema.component.sass']
 })
 export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
-
-  readonly touchDevice = navigator.maxTouchPoints || 'ontouchstart' in document.documentElement
 
   private route:ActivatedRoute
 
@@ -241,14 +241,19 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     this.state.x = x
     this.state.y = y
     this.stateChanged.emit(this.state)
+    $('.input').css({
+      position: 'absolute',
+      top: y * (this.cellSize+1), left: x * (this.cellSize+1),
+      width: this.cellSize+'px', height: this.cellSize+'px'
+    })
 
     this.highlightCurrentWord()
     this.fixFocus()
   }
 
   fixFocus() {
-    $('.input').val(this.getCell()).select()
-    setTimeout(() => $('.input').focus(), 100)
+    $('.input').val('')
+    setTimeout(() => $('.input').focus(), 200)
   }
 
   getCell() {
@@ -281,8 +286,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
 
   onInputFocus($event) {
     this.state.focused = true
-    $event.target.value = this.getCell()
-    $event.target.select()
+    $event.target.value = ''//this.getCell()
+    //$event.target.select()
   }
 
   onInputBlur() {
@@ -290,7 +295,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   onInput($event) {
-    $event.target.select()
+    //$event.target.select()
+    //console.log($event)
 
     //blocks
     if (this.input===".") {
@@ -302,7 +308,7 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
       this.moveCursor(1)
     //delete and stay
     } else if (this.input==="") {
-      if (this.touchDevice)
+      if (Utils.isMobile())
         this.moveCursor(-1)
       this.setCell(" ")
       this.fixFocus()
@@ -314,9 +320,11 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
         this.setCell(this.input.toUpperCase())
         this.moveCursor(1)
       }
+      $('.input').val('')
     //force insert char and stay
     } else if (this.input.match(/^[A-Z]$/)) {
       this.setCell(this.input)
+      $('.input').val('')
     } else if (this.input==='+') {
       this.service.setHint(this.state.y, this.state.x, true)
     } else if (this.input==='-') {
@@ -369,6 +377,12 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
       this.moveCursor(-1)
       this.setCell(" ")
       return false
+    // } else if (event.key.match(/^[a-z]$/)) {
+    //   if (this.getCell()!=='.') {//do not overwrite a block just by typing lowercase
+    //     this.setCell(event.key.toUpperCase())
+    //     this.moveCursor(1)
+    //   }
+    //force insert char and stay
     }
   }
 

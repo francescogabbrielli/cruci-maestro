@@ -23,9 +23,8 @@ import { MatListModule } from '@angular/material/list'
 import { MatInputModule } from '@angular/material/input'
 import { MatSelectModule } from '@angular/material/select'
 import { MatRadioModule } from '@angular/material/radio'
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
-
+import { MatSnackBarModule } from '@angular/material/snack-bar'
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet'
 
 @NgModule({
   declarations: [

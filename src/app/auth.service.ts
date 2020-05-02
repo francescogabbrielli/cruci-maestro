@@ -66,10 +66,11 @@ export class AuthService {
   }
 
   login(username, password):Promise<boolean> {
+    //console.log("Logging in...")
     return this.be.login(username, password).then(
       (user:User) => {
         localStorage.setItem('currentUser', JSON.stringify(user))
-        //console.log("LOGIN", user)
+        //console.log("Login Ok", user)
         this.user.next(user)
         return true
       }
@@ -78,12 +79,15 @@ export class AuthService {
 
   logout() {
       // remove user from local storage and set current user to null
+      //console.log("Logging out...")
+      localStorage.removeItem('currentUser')
       this.be.logout().then(
-        data => this.user.next(null),
+        data => {
+          //console.log("Logout ok")
+          return this.user.next(null)
+        },
         err  => console.log(err),
       )
-      localStorage.removeItem('currentUser')
-      console.log("LOGOUT")
   }
 
   updateUserConfig() {
