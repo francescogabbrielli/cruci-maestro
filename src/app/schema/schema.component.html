@@ -1,18 +1,18 @@
 <div class="wrapper">
-  <input class="input" size="1" maxlength="1" type="text" maxlength="1" tabindex="1" [(ngModel)]="input"
+  <input class="input cursor" size="1" maxlength="1" type="text" maxlength="1" tabindex="1" [(ngModel)]="input"
     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-    (focus)="onInputFocus($event)" (blur)="onInputBlur()" (input)="onInput($event)" (keydown)="onKeyDown($event)">
+    (focus)="onInputFocus($event)" (blur)="onInputBlur()" (input)="onInput($event)" (keydown)="onKeyDown($event)"
+    (dblclick)="toggleOrientation()">
   <table class="schema noselect">
     <tr *ngFor="let row of model.cells; index as i; last as lastRow">
       <td *ngFor="let cell of row; index as j; last as lastColumn"
-        (mousedown)="prepareDrag(i, j, lastRow && lastColumn, $event)"
-        (dblclick)="toggleOrientation()">
+        (mousedown)="prepareDrag(i, j, lastRow && lastColumn, $event)">
         <div *ngIf="cell==='.'" class="block" [ngClass]="{'locked': isLocked(i,j) && (model.type!='fixed' || config.authorMode)}"
           [style.width]="cellSize+'px'" [style.height]="cellSize+'px'">
         </div>
-        <div *ngIf="j==state.x && i==state.y" class="cursor"
+        <!--div *ngIf="j==state.x && i==state.y" class="cursor"
           [style.width]="cellSize+'px'" [style.height]="cellSize+'px'">
-        </div>
+        </div-->
         <div id="cell-{{i}}-{{j}}" class="cell"
           [style.width]="cellSize+'px'" [style.height]="cellSize+'px'"
           [style.font-size]="(3+cellSize/2)+'px'"

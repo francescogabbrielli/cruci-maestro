@@ -31,7 +31,8 @@ export class BackendService {
   }
 
   async logout():Promise<any> {
-     this.client.auth.logout().finally(() => {
+     return this.client.auth.logout().finally(() => {
+       //console.log("Trying to log in again...")
        this.initPromise = this.client.auth.loginWithCredential(new AnonymousCredential())
        return this.initPromise
      })

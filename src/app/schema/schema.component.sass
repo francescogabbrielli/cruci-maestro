@@ -10,6 +10,7 @@ $cell-radius: 5px
 .wrapper
   margin: 0px
   padding: 0px
+  position: relative
 
 table
   border-spacing: 0
@@ -37,8 +38,16 @@ table td
   border-bottom: $cell-border
 
 .input
-  border: none
-  font-size: 1px
+  color: transparent
+  caret-color: transparent
+  outline: none
+  border-width: 0px
+  padding: 1px
+  width: $cell-size
+  height: $cell-size
+  text-align: center
+  font-weight: bold
+  font-size: $cell-size/2+2
 
 .cell
   box-sizing: border-box
