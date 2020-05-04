@@ -1,7 +1,8 @@
-import { Component, HostListener, EventEmitter, Input, Output } from '@angular/core'
+import { Component, HostListener, EventEmitter, Input, Output, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core'
 import { DragDropModule } from '@angular/cdk/drag-drop'
+import { MatTooltip } from '@angular/material/tooltip'
 
 import {Subscription} from 'rxjs/Subscription'
 import $ from "jquery"
@@ -13,6 +14,19 @@ import { SchemaService } from '../schema.service'
 import { SchemaModel, SchemaType, Highlight } from '../schema.model'
 import { SchemaState } from './state'
 
+
+class Tooltip {
+  constructor(private schema: SchemaComponent) {
+    let n = schema.tooltipData.n
+    setTimeout(() => this.schema.tooltip.show(), 300)
+    setTimeout(() => {
+      if (n === this.schema.tooltipData.n)
+        this.schema.tooltip.hide()
+    }, 2500)
+  }
+}
+
+
 @Component({
   selector: 'schema',
   templateUrl: './schema.component.html',
@@ -20,11 +34,13 @@ import { SchemaState } from './state'
 })
 export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
 
+
   private route:ActivatedRoute
 
   private service:SchemaService
 
   private subscription:Subscription
+
 
   input:string
   cells:string[][]
@@ -38,6 +54,10 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
 
   model:SchemaModel
   state:SchemaState
+
+  @ViewChild('tooltip')
+  tooltip:MatTooltip
+  tooltipData:{def:string, n:number} = {def:'', n:0}
 
   @Input()
   selection:Highlight
@@ -155,6 +175,16 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   setSelection(h:Highlight) {
     this.selection = h
     this.service.setSelection(h)
+
+    //show tooltip definition on mobi
+    //if (Utils.isMobile()) {
+    this.tooltipData = {
+      def: this.service.getDefs(this.selection).map(d=>d.desc).join(" - "),
+      n: this.tooltipData.n + 1
+    }
+    new Tooltip(this)
+    //}
+
     this.selected.emit(h)
   }
 

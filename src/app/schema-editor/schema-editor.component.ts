@@ -36,14 +36,14 @@ export class SchemaEditorComponent implements OnInit, OnDestroy {
 
   onSelected(h:Highlight) {
     this.selection = h
-    if (Utils.isMobile() && h.length() > 1) {
-      let desc:string = h.isHorizontal() ? "Orizzontale" : "Verticale"
-      let string:string = this.schema.getDefs(h).map(d => d.desc).join(" - ")
-      this.bar.open(string, desc, {
-        duration: 2000,
-        verticalPosition: 'top'
-      })
-    }
+    // if (Utils.isMobile() && h.length() > 1) {
+    //   let desc:string = h.isHorizontal() ? "Orizzontale" : "Verticale"
+    //   let string:string = this.schema.getDefs(h).map(d => d.desc).join(" - ")
+    //   this.bar.open(string, desc, {
+    //     duration: 2000,
+    //     verticalPosition: 'top'
+    //   })
+    // }
   }
 
   onDefinitionSelection(h:Highlight) {

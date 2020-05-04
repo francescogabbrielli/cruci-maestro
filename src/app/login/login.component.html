@@ -11,7 +11,7 @@
       <input name="password" type="password"
         required matInput [(ngModel)]="model.password" #password="ngModel"/>
     </mat-form-field>
-    <button type="submit" mat-flat-button color="primary"
+    <button type="submit" mat-raised-button color="primary"
       [disabled]="!theForm.form.valid || loading">Login</button>
     <p><br/></p>
     <p class="error" [hidden]="!error">Login error: {{error}}</p>

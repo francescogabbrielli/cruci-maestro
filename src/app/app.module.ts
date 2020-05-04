@@ -25,6 +25,7 @@ import { MatSelectModule } from '@angular/material/select'
 import { MatRadioModule } from '@angular/material/radio'
 import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet'
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import { MatBottomSheetModule } from '@angular/material/bottom-sheet'
     MatSelectModule,
     MatRadioModule,
     MatSnackBarModule,
-    MatBottomSheetModule
+    MatBottomSheetModule,
+    MatTooltipModule
   ],
   bootstrap: [AppComponent]
 })
