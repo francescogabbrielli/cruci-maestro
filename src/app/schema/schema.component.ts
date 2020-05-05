@@ -8,7 +8,6 @@ import {Subscription} from 'rxjs/Subscription'
 import $ from "jquery"
 
 import { Utils } from '../utils'
-
 import { Config } from '../auth.service'
 import { SchemaService } from '../schema.service'
 import { SchemaModel, SchemaType, Highlight } from '../schema.model'
@@ -18,11 +17,12 @@ import { SchemaState } from './state'
 class Tooltip {
   constructor(private schema: SchemaComponent) {
     let n = schema.tooltipData.n
-    setTimeout(() => this.schema.tooltip.show(), 300)
+    schema.tooltip.hide()
     setTimeout(() => {
-      if (n === this.schema.tooltipData.n)
-        this.schema.tooltip.hide()
-    }, 2500)
+      schema.tooltipData.n++
+      schema.tooltipData.def = schema.getDefinition()
+    }, schema.tooltip.showDelay/2)
+    setTimeout(() => schema.tooltip.show(), schema.tooltip.showDelay)
   }
 }
 
@@ -172,18 +172,19 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  getDefinition() {
+    return this.type===SchemaType.Obliged && !this.config.authorMode
+      ? ''
+      : this.service.getDefs(this.selection).map(d=>d.desc).join(" - ")
+  }
+
   setSelection(h:Highlight) {
     this.selection = h
     this.service.setSelection(h)
 
-    //show tooltip definition on mobi
-    //if (Utils.isMobile()) {
-    this.tooltipData = {
-      def: this.service.getDefs(this.selection).map(d=>d.desc).join(" - "),
-      n: this.tooltipData.n + 1
-    }
+    //show tooltip definition (on mobile only?)
+    //if (Utils.isMobile())
     new Tooltip(this)
-    //}
 
     this.selected.emit(h)
   }

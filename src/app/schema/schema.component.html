@@ -3,7 +3,7 @@
     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
     (focus)="onInputFocus($event)" (blur)="onInputBlur()" (input)="onInput($event)" (keydown)="onKeyDown($event)"
     (dblclick)="toggleOrientation()"
-    [matTooltip]="tooltipData.def" #tooltip="matTooltip">
+    [matTooltip]="tooltipData.def" #tooltip="matTooltip" [matTooltipShowDelay]="250" [matTooltipDisabled]="tooltipData.def===''">
   <table class="schema noselect">
     <tr *ngFor="let row of model.cells; index as i; last as lastRow">
       <td *ngFor="let cell of row; index as j; last as lastColumn"
