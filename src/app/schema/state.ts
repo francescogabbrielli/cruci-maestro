@@ -3,4 +3,5 @@ export interface SchemaState {
   y:number,
   horizontal:boolean,
   focused:boolean,
+  visible?:boolean
 }

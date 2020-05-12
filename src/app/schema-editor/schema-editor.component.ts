@@ -60,7 +60,7 @@ export class SchemaEditorComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.schemaSubscription = this.schema.subscribe(loading => {
-      console.log("SCHEMA CHANGE", loading)
+      //console.log("SCHEMA CHANGE", loading)
       if (loading)
         return
       this.userConfig = {...this.auth.getUserConfig()}

@@ -3,26 +3,14 @@
 
 // Variables
 $cell-border: 1px solid black
-$cell-size: 28px
-$cell-radius: 5px
-
+$cell-radius: 3px
+$border-width: 1px
+$word-color: map-get($primary, 50)
 
 .wrapper
   margin: 0px
   padding: 0px
   position: relative
-
-table
-  border-spacing: 0
-  border-collapse: collapse
-  padding: 0px
-  margin: 0px
-
-table td
-  margin: 0px
-  padding: 0px
-  border: $cell-border
-
 
 .noselect
   -webkit-touch-callout: none /* iOS Safari */
@@ -32,89 +20,108 @@ table td
   -ms-user-select: none /* Internet Explorer/Edge */
   user-select: none /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
 
-
 .schema
+  //border: 0px solid gray
+  border-spacing: collapse
+  display: table
+  border-left: 0px solid transparent
+  border-top: 0px solid transparent
   border-right: $cell-border
   border-bottom: $cell-border
+
+.table-row
+  display: table-row
+  margin: 0px
+  padding: 0px
+
+.table-cell
+  margin: 0px
+  padding: 0px
+  display: table-cell
+  box-sizing: border-box
+  border-left: $cell-border
+  border-top: $cell-border
+  text-align: center
+  vertical-align: middle
 
 .input
   color: transparent
   caret-color: transparent
   outline: none
-  border-width: 0px
-  padding: 1px
-  width: $cell-size
-  height: $cell-size
+  border: 0px solid transparent
+  padding: 0px
   text-align: center
   font-weight: bold
-  font-size: $cell-size/2+2
 
 .cell
+  margin: 0px
   box-sizing: border-box
-  width: 100%
-  height: 100%
   background-color: transparent
+  display: flex
   justify-content: center
   align-items: center
-  text-align: center
-  display: flex
   font-weight: bold
-  font-size: $cell-size/2+2
-  border-color: gray
+  border-color: transparent
   border-style: solid
   border-width: 0px
   position: relative
   z-index: 2
+  height: 100%
+  width: 100%
 
 .cell.focused
   border-color: map-get($primary, 400)
 
 .block
-  box-sizing: border-box
-  border: 2px solid white
+  margin: 0.1em
   background-color: black
   position: absolute
-  border-radius: 4px
+  border-radius: $cell-radius
   z-index: 1
 
 .cursor
   opacity: 0.7
-  background-color: map-get($primary, 100)
+  background-color: map-get($primary, 200)
   position: absolute
-  z-index: 3
+  z-index: 4
 
 .word-h
-  border-top-width: 2px
-  border-bottom-width: 2px
+  background-color: $word-color
+  border-top-width: $border-width
+  border-bottom-width: $border-width
 
 .word-sh
+  background-color: $word-color
   border-top-left-radius: $cell-radius
   border-bottom-left-radius: $cell-radius
-  border-left-width: 2px
+  border-left-width: $border-width
 
 .word-eh
+  background-color: $word-color
   border-top-right-radius: $cell-radius
   border-bottom-right-radius: $cell-radius
-  border-right-width: 2px
+  border-right-width: $border-width
 
 .word-v
-  border-left-width: 2px
-  border-right-width: 2px
+  background-color: $word-color
+  border-left-width: $border-width
+  border-right-width: $border-width
 
 .word-sv
+  background-color: $word-color
   border-top-left-radius: $cell-radius
   border-top-right-radius: $cell-radius
-  border-top-width: 2px
+  border-top-width: $border-width
 
 .word-ev
+  background-color: $word-color
   border-bottom-left-radius: $cell-radius
   border-bottom-right-radius: $cell-radius
-  border-bottom-width: 2px
+  border-bottom-width: $border-width
 
 .block.locked
   background-color: map-get($accent, 800) !important
 
 .cell.locked
   color: map-get($accent, 800) !important
-  font-weight: 900 !important
-  font-size: $cell-size/2 + 2
+  //font-weight: 900 !important
