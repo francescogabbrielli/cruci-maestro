@@ -1,22 +1,23 @@
 <div class="wrapper">
-  <input class="input cursor" size="1" maxlength="1" type="text" maxlength="1" tabindex="1" [(ngModel)]="input"
+  <input class="input cursor" size="1" maxlength="1" type="text" tabindex="1"
+    [(ngModel)]="input"
+    [style.visibility]="state.visible ? 'visible' : 'hidden'"
     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-    (focus)="onInputFocus($event)" (blur)="onInputBlur()" (input)="onInput($event)" (keydown)="onKeyDown($event)"
+    (focus)="onInputFocus($event)" (blur)="onInputBlur()"
+    (input)="onInput($event)" (keydown)="onKeyDown($event)"
     (dblclick)="toggleOrientation()"
     [matTooltip]="tooltipData.def" #tooltip="matTooltip" [matTooltipShowDelay]="250" [matTooltipDisabled]="tooltipData.def===''">
-  <table class="schema noselect">
-    <tr *ngFor="let row of model.cells; index as i; last as lastRow">
-      <td *ngFor="let cell of row; index as j; last as lastColumn"
-        (mousedown)="prepareDrag(i, j, lastRow && lastColumn, $event)">
+  <div class="schema noselect">
+    <div class="table-row" *ngFor="let row of model.cells; index as i; last as lastRow">
+      <div class="table-cell" *ngFor="let cell of row; index as j; last as lastColumn"
+        (mousedown)="prepareDrag(i, j, lastRow && lastColumn, $event)"
+        [style.minWidth]="cellSize+'px'"
+        [style.width]="cellSize+'px'" [style.height]="cellSize+'px'">
         <div *ngIf="cell==='.'" class="block" [ngClass]="{'locked': isLocked(i,j) && (model.type!='fixed' || config.authorMode)}"
-          [style.width]="cellSize+'px'" [style.height]="cellSize+'px'">
+          [style.width]="(cellSize-4)+'px'" [style.height]="(cellSize-4)+'px'">&nbsp;
         </div>
-        <!--div *ngIf="j==state.x && i==state.y" class="cursor"
-          [style.width]="cellSize+'px'" [style.height]="cellSize+'px'">
-        </div-->
         <div id="cell-{{i}}-{{j}}" class="cell"
-          [style.width]="cellSize+'px'" [style.height]="cellSize+'px'"
-          [style.font-size]="(3+cellSize/2)+'px'"
+          [style.font-size]="(4+cellSize/2)+'px'"
           [style.border-color]="selection.unused ? 'red' : ''"
           [ngClass]="{
               'word-sh': state.horizontal && selection.startsWith(j,i),
@@ -27,12 +28,10 @@
               'word-ev': !state.horizontal && selection.endsWith(j,i),
               'focused': state.focused,
               'locked': isLocked(i,j)
-              }">
-          {{cell!=='.'?cell:''}}
-        </div>
-      </td>
-    </tr>
-  </table>
+              }">{{cell!=='.'?cell:' '}}</div>
+      </div>
+    </div>
+  </div>
   <!--defs [state]="state" [selection]="selection"></defs>
   <span tabindex="3" onFocus="document.querySelector('.input').focus()"></span-->
 </div>

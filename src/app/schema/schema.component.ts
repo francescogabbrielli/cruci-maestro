@@ -17,6 +17,8 @@ import { SchemaState } from './state'
 class Tooltip {
   constructor(private schema: SchemaComponent) {
     let n = schema.tooltipData.n
+    if (schema.tooltip === undefined)
+      return
     schema.tooltip.hide()
     setTimeout(() => {
       schema.tooltipData.n++
@@ -96,7 +98,6 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
       return
     this.service.populate(this.cells)
     this.setCurrentHighlight(this.service.getSelection())
-    this.stateChanged.emit(this.state)
     $('.input').focus()
   }
 
@@ -266,17 +267,22 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
       y = this.state.horizontal ? this.state.y : this.state.y+x
       x = this.state.horizontal ? this.state.x+x : this.state.x
     }
-    if (x<0 || x>=this.size.cols || y<0 || y>=this.size.rows)
-      return
 
+    if (x<0 || x>=this.size.cols || y<0 || y>=this.size.rows) {
+      this.state.visible = false
+      return
+    }
+
+    this.state.visible = true
     this.state.x = x
     this.state.y = y
     this.stateChanged.emit(this.state)
     $('.input').css({
       position: 'absolute',
-      top: y * (this.cellSize+1), left: x * (this.cellSize+1),
-      width: this.cellSize+'px', height: this.cellSize+'px'
+      top: (y * this.cellSize)+'px', left: (x * this.cellSize)+'px',
+      width: (this.cellSize)+'px', height: (this.cellSize)+'px'
     })
+    //console.log($('#cell-'+y+'-'+x).width())
 
     this.highlightCurrentWord()
     this.fixFocus()
@@ -298,7 +304,12 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   setCell(value) {
     if (this.service.isCellLocked(this.state.y, this.state.x))
       return;
+    if (!value)
+      value = ' '
+    if (value.length>1)
+      value = value.charAt(0)
     let old = this.getCell()
+    //console.log("SET", "|"+old+"|", "|"+value+"|")
     this.cells[this.state.y][this.state.x] = value
     this.service.setCell(this.state.y, this.state.x, value)
     if (old!==value && (old==="." || value===".")) {
@@ -338,9 +349,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
       this.setCell(" ")
       this.moveCursor(1)
     //delete and stay
-    } else if (this.input==="") {
-      if (Utils.isMobile())
-        this.moveCursor(-1)
+    } else if (Utils.isMobile() && this.input==="") {
+      this.moveCursor(-1)
       this.setCell(" ")
       this.fixFocus()
       //$event.target.select()
@@ -374,7 +384,7 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   keyDown(event: KeyboardEvent) {
     if (!this.state.focused)
       return true
-    // console.log(event.key)
+    //console.log(event.key)
     if (event.key === "ArrowRight" || event.key === "Right") {
       this.moveCursor(this.state.x+1, this.state.y)
       //this.toggleOrientation(true)
@@ -403,6 +413,9 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     } else if (event.key === "PageDown") {
       let p = this.getNextPosition(1)
       this.moveCursor(p[0], p[1])
+    //delete char
+    } else if (!Utils.isMobile() && event.key === "Delete") {
+      this.setCell(" ")
     //delete char and move backward
     } else if (event.keyCode==8 || event.key === "Backspace") {
       this.moveCursor(-1)

@@ -127,8 +127,6 @@
           "options": {
             "region": "eu-central-1",
             "bucket": "www.francescogabbrielli.it",
-            "secretAccessKey": "UTTRxEP3zJ7/lNRAwhq955u0CfcmlPInNs5D13Hu",
-            "accessKeyId": "AKIA25LSPTCTLJJZ43VD",
             "subFolder": "apps/cruci-maestro"
           }
         }

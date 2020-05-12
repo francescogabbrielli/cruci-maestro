@@ -10,6 +10,9 @@ export class Highlight {
   isHorizontal():boolean {
     return this.start[1] === this.end[1]
   }
+  isOn():boolean {
+    return this.start[0]>=0 && this.start[1]>=0
+  }
   equals(h:Highlight) {
     return h ? this.start[0] === h.start[0] && this.start[1] === h.start[1] && this.end[0] === h.end[0] && this.end[1] === h.end[1] : false
   }

@@ -200,6 +200,11 @@ export class SchemaService {
       this.setCell(...cell)
     }
 
+    // definitions
+    if (!this.authorMode)
+      for (let d of this.model.definitions)
+        d.unused = false
+
     this.loading.next(false)
   }
 
