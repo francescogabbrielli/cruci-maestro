@@ -54,7 +54,6 @@ export class SchemaService {
       if (triggerLoad)
         this.load()
     })
-    //this.updated.subscribe((v) => console.log("UPDATED", v))
   }
 
   subscribe(fn) {
@@ -137,20 +136,23 @@ export class SchemaService {
   }
 
   setDef(def:Definition) {
-    //inserimento
+    //insert
     let index = def.highlight.toString()
     if (def.desc && def.isnew) {
       this.defs[index] = def
       def.isnew = false
     }
-    //cancellazione
+    //delete
     else if (!def.desc && !def.isnew) {
       delete this.defs[index]
     }
   }
 
   /**
-   * Restituisce tutte le difinizioni contenute nella selezione passata
+   * Return all definitions inside the selection
+   *
+   * @param selection the selection
+   * @return the array of definitions
    */
   getDefs(selection?:Highlight):Definition[] {
     selection = selection || this.selection
@@ -168,12 +170,16 @@ export class SchemaService {
       yield this.defs[keys[step++]]
   }
 
-  /********************************************************
+  /**
    *  Recompute definitions at (x,y) because of a new block
    *  either being added or removed.
-   *  => mark them as used or unused
+   *  (recompute means marking them as used or unused)
+   * @param x x position
+   * @param y y position
+   * @param blockAdded true if a block has been added or false
+   *  if a block has been removed
    */
-  reDef(x:number, y:number, blockAdded:boolean) {
+  reDef(x:number, y:number, blockAdded:boolean):void {
     for (let def of this.defsGenerator())
       if (def.highlight.contains(x, y)) {
         def.unused = blockAdded
@@ -271,14 +277,6 @@ export class SchemaService {
         ).finally(() => this.modified = false)
     }
     return new Promise(null)
-    // client.auth.loginWithCredential(new UserPasswordCredential("demo@francescogabbrielli.it", "demo20"))
-    // .then((login) => {
-    //   return db.collection('tests').updateOne({title: "test4"}, {$set: {owner_id: 'd', test: true}}, {upsert: true})
-    // }).then(res => {
-    //   console.log(res, btoa(JSON.stringify(this.cells)))
-    // }).catch(err => {
-    //   console.error(err)
-    // })
   }
 
   check():Promise<any> {

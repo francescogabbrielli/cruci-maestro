@@ -1,7 +1,6 @@
 <div class="wrapper">
   <input class="input cursor" size="1" maxlength="1" type="text" tabindex="1"
     [(ngModel)]="input"
-    [style.visibility]="state.visible ? 'visible' : 'hidden'"
     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
     (focus)="onInputFocus($event)" (blur)="onInputBlur()"
     (input)="onInput($event)" (keydown)="onKeyDown($event)"
@@ -11,13 +10,15 @@
     <div class="table-row" *ngFor="let row of model.cells; index as i; last as lastRow">
       <div class="table-cell" *ngFor="let cell of row; index as j; last as lastColumn"
         (mousedown)="prepareDrag(i, j, lastRow && lastColumn, $event)"
-        [style.minWidth]="cellSize+'px'"
+        [style.minWidth]="cellSize+'px'" [style.minHeight]="cellSize+'px'"
         [style.width]="cellSize+'px'" [style.height]="cellSize+'px'">
-        <div *ngIf="cell==='.'" class="block" [ngClass]="{'locked': isLocked(i,j) && (model.type!='fixed' || config.authorMode)}"
-          [style.width]="(cellSize-4)+'px'" [style.height]="(cellSize-4)+'px'">&nbsp;
+        <div *ngIf="cell==='.'"
+          class="block" [ngClass]="{'locked': isLocked(i,j) && (model.type!='fixed' || config.authorMode)}"
+          [style.width]="(cellSize-1)+'px'" [style.height]="(cellSize-1)+'px'">
+          &nbsp;
         </div>
         <div id="cell-{{i}}-{{j}}" class="cell"
-          [style.font-size]="(4+cellSize/2)+'px'"
+          [style.font-size]="(3+cellSize/2)+'px'"
           [style.border-color]="selection.unused ? 'red' : ''"
           [ngClass]="{
               'word-sh': state.horizontal && selection.startsWith(j,i),
