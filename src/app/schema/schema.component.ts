@@ -1,10 +1,9 @@
 import { Component, HostListener, EventEmitter, Input, Output, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core'
+import { OnInit, OnChanges, SimpleChanges } from '@angular/core'
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { MatTooltip } from '@angular/material/tooltip'
 
-import {Subscription} from 'rxjs/Subscription'
 import $ from "jquery"
 
 import { Utils } from '../utils'
@@ -34,15 +33,11 @@ class Tooltip {
   templateUrl: './schema.component.html',
   styleUrls: ['./schema.component.sass']
 })
-export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
-
+export class SchemaComponent implements OnInit, OnChanges {
 
   private route:ActivatedRoute
 
   private service:SchemaService
-
-  private subscription:Subscription
-
 
   input:string
   cells:string[][]
@@ -80,7 +75,7 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     this.route = route
     this.service = service
     this.cells = this.service.create2DArray(999,999)
-    this.state = {x:0, y:0, horizontal:true, focused:false}
+    this.state = {x:0, y:0, horizontal:true, focused:false, visible:false}
     this.selection = this.service.noSelection
   }
 
@@ -97,12 +92,9 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     if (this.service.isLoading())
       return
     this.service.populate(this.cells)
-    this.setCurrentHighlight(this.service.getSelection())
-    $('.input').focus()
-  }
 
-  ngOnDestroy() {
-    //this.subscription.unsubscribe()
+    setTimeout(() => this.setCurrentHighlight(this.service.getSelection()), 100)
+
   }
 
   ngOnChanges(changes:SimpleChanges) {
@@ -148,8 +140,6 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     if (this.config.authorMode) {
       this.dragging = activate
       this.dragPosition = {x: event.clientX, y: event.clientY}
-      if (activate)
-        this.selection = this.service.noSelection
     }
 
     event.preventDefault()
@@ -168,6 +158,7 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     }
     let t = new Date().getTime()
     if (newSize!==this.resizing && t > this.lastReframe+50) {
+      this.selection = this.service.noSelection
       this.lastReframe = t
       this.reframe(newSize)
     }
@@ -184,8 +175,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     this.service.setSelection(h)
 
     //show tooltip definition (on mobile only?)
-    //if (Utils.isMobile())
-    new Tooltip(this)
+    if (Utils.isMobile())
+      new Tooltip(this)
 
     this.selected.emit(h)
   }
@@ -195,6 +186,7 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     let [x0, y0] =  [...selection.start]
     let [x1, y1] =  [...selection.end]
     this.moveCursor(x0, y0)
+    console.log(selection)
     if (this.selection.start[0]!==x0 || this.selection.start[1]!==y0
       || this.selection.end[0]!==x1 || this.selection.end[1]!==y1) {
       let sel = new Highlight(x0, y0, x1, y1)
@@ -227,10 +219,9 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
       if (pos[1-index]<0 || pos[1-index] >= size[1-index])
         break
       if (found!==undefined) {
-        if (this.cells[pos[1]][pos[0]] === '.')
-          found = undefined
-        else
+        if (this.cells[pos[1]][pos[0]] !== '.')
           break
+        found = undefined
       } else if (this.cells[pos[1]][pos[0]] !== '.')
         found = [pos[0], pos[1]]
     } while (true)
@@ -238,6 +229,8 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   highlightCurrentWord():void {
+    if (!this.state.visible)
+      return
     let highlight = this.highlightWord(this.state.x, this.state.y)
     if (!this.selection.equals(highlight))
       this.setSelection(highlight)
@@ -263,34 +256,35 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   moveCursor(x:number, y?:number) {
+
+    $('.input').focus()
+
     if (y===undefined) {
       y = this.state.horizontal ? this.state.y : this.state.y+x
       x = this.state.horizontal ? this.state.x+x : this.state.x
     }
 
-    if (x<0 || x>=this.size.cols || y<0 || y>=this.size.rows) {
-      this.state.visible = false
-      return
-    }
+    // if (x<0 || x>=this.size.cols || y<0 || y>=this.size.rows)
+    //   return
 
-    this.state.visible = true
+    this.state.visible = x>=0 && y>=0
     this.state.x = x
     this.state.y = y
     this.stateChanged.emit(this.state)
+
+    let o = $('#cell-0-0').offset() || {left: 0, top:0}
+    let offset = $('#cell-'+y+'-'+x).offset() || o
+    let size = this.state.visible ? this.cellSize : 1
     $('.input').css({
       position: 'absolute',
-      top: (y * this.cellSize)+'px', left: (x * this.cellSize)+'px',
-      width: (this.cellSize)+'px', height: (this.cellSize)+'px'
+      top: (offset.top-o.top)+'px',
+      left: (offset.left-o.left)+'px',
+      width: size+'px',
+      height: size+'px'
     })
-    //console.log($('#cell-'+y+'-'+x).width())
 
     this.highlightCurrentWord()
-    this.fixFocus()
-  }
 
-  fixFocus() {
-    $('.input').val('')
-    setTimeout(() => $('.input').focus(), 200)
   }
 
   getCell() {
@@ -329,16 +323,18 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
   onInputFocus($event) {
     this.state.focused = true
     $event.target.value = ''//this.getCell()
+    //console.log("INPUT FOCUS")
     //$event.target.select()
   }
 
   onInputBlur() {
+    //console.log("INPUT BLUR")
     this.state.focused = false
   }
 
   onInput($event) {
     //$event.target.select()
-    //console.log($event)
+    //console.log("INPUT", $event)
 
     //blocks
     if (this.input===".") {
@@ -352,25 +348,23 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
     } else if (Utils.isMobile() && this.input==="") {
       this.moveCursor(-1)
       this.setCell(" ")
-      this.fixFocus()
-      //$event.target.select()
-      //$event.target.value = this.getCell()
     //insert char if not on a block and move forward
     } else if (this.input.match(/^[a-z]$/)) {
       if (this.getCell()!=='.') {//do not overwrite a block just by typing lowercase
         this.setCell(this.input.toUpperCase())
         this.moveCursor(1)
       }
-      $('.input').val('')
+      //$('.input').val(' ')
     //force insert char and stay
     } else if (this.input.match(/^[A-Z]$/)) {
       this.setCell(this.input)
-      $('.input').val('')
+      //$('.input').val(' ')
     } else if (this.input==='+') {
       this.service.setHint(this.state.y, this.state.x, true)
     } else if (this.input==='-') {
       this.service.setHint(this.state.y, this.state.x, false)
     }
+    $('.input').val('')
     //console.log("INPUT: ", $event)
   }
 
@@ -421,13 +415,11 @@ export class SchemaComponent implements OnInit, OnDestroy, OnChanges {
       this.moveCursor(-1)
       this.setCell(" ")
       return false
-    // } else if (event.key.match(/^[a-z]$/)) {
-    //   if (this.getCell()!=='.') {//do not overwrite a block just by typing lowercase
-    //     this.setCell(event.key.toUpperCase())
-    //     this.moveCursor(1)
-    //   }
-    //force insert char and stay
     }
+  }
+
+  toString() {
+    return JSON.stringify(this.model)
   }
 
 }

@@ -32,7 +32,7 @@ export class BackendService {
 
   async logout():Promise<any> {
      return this.client.auth.logout().finally(() => {
-       //console.log("Trying to log in again...")
+       console.log("Trying to log in again...")
        this.initPromise = this.client.auth.loginWithCredential(new AnonymousCredential())
        return this.initPromise
      })
