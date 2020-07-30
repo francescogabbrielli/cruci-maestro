@@ -264,10 +264,10 @@ export class SchemaComponent implements OnInit, OnChanges {
       x = this.state.horizontal ? this.state.x+x : this.state.x
     }
 
-    // if (x<0 || x>=this.size.cols || y<0 || y>=this.size.rows)
-    //   return
+    this.state.visible = x>=0 && y>=0 && x<this.size.cols && y<this.size.rows
+    if (!this.state.visible)
+       return
 
-    this.state.visible = x>=0 && y>=0
     this.state.x = x
     this.state.y = y
     this.stateChanged.emit(this.state)

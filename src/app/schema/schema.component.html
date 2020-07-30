@@ -5,7 +5,9 @@
     (focus)="onInputFocus($event)" (blur)="onInputBlur()"
     (input)="onInput($event)" (keydown)="onKeyDown($event)"
     (dblclick)="toggleOrientation()"
-    [matTooltip]="tooltipData.def" #tooltip="matTooltip" [matTooltipShowDelay]="250" [matTooltipDisabled]="tooltipData.def===''">
+    [matTooltip]="tooltipData.def" #tooltip="matTooltip" [matTooltipShowDelay]="250" [matTooltipDisabled]="tooltipData.def===''"
+    [style.visibility]="state.visible ? 'visible' : 'hidden'"
+    >
   <div class="schema noselect">
     <div class="table-row" *ngFor="let row of model.cells; index as i; last as lastRow">
       <div class="table-cell" *ngFor="let cell of row; index as j; last as lastColumn"
