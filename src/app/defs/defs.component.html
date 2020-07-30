@@ -9,7 +9,7 @@
           {{state.horizontal ? "Orizzontale" : "Verticale"}} - {{selection.length()}} lettere
         </span>
       </mat-label>
-      <input [tabindex]="tabindex" name="def" matInput placeholder="...definition..."
+      <input [tabindex]="tabindex" name="def" matInput placeholder="...definizione..."
         [readonly]="!config.authorMode"
         [disabled]="selection.length()<=1"
         [(ngModel)]="defs[0].desc"
